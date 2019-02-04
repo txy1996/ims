@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.VoucherclassDao">
+	<resultMap id="VoucherclassResultMap" type="Voucherclass">
+		<result column="vcid" property="vcid" />
+		<result column="vcvcid" property="vcvcid" />
+		<result column="vcname" property="vcname" />
+		<result column="vcinfo" property="vcinfo" />
+	</resultMap>
+	<select id="getVcname" parameterType="String" resultType="Voucherclass">
+		select vcid,vcname from voucherclass
+	</select>
+	<select id="getid" parameterType="int" resultType="Voucherclass">
+	select * from voucherclass where vcid = #{vcid}
+	</select>
+	<select id="select" resultType="Voucherclass">
+	select vcid,vcvcid,vcname,vcinfo from voucherclass
+	</select>
+	<delete id="delete" parameterType="int">
+	delete from voucherclass where vcid = #{vcid}
+	</delete>
+	<update id="update" parameterType="Voucherclass">
+	update voucherclass
+	<set>
+	 <if test="vcvcid != null">vcvcid=#{vcvcid},</if>
+	 <if test="vcname != null">vcname=#{vcname},</if>
+	 <if test="vcinfo != null">vcinfo=#{vcinfo},</if>
+	</set>
+	where vcid = #{vcid}
+	</update>
+	<insert id="add" useGeneratedKeys="true" keyProperty="vcid" parameterType="Voucherclass">
+	insert into voucherclass (vcid,vcvcid,vcname,vcinfo)
+	values 
+	(#{vcid},#{vcvcid},#{vcname},#{vcinfo})
+	</insert>
+</mapper>

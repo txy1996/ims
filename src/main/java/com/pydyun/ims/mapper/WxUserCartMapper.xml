@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxUserCartDao" >
+
+    <resultMap id = "WxUserCartMap" type = "WxUserCart" >
+        <result column = "id" property = "id" />
+        <result column = "uid" property = "uid" />
+        <result column = "oid" property = "oid" />
+        <result column = "otype" property = "otype" />
+        <result column = "number" property = "number" />
+        <result column = "status" property = "status" />
+        <result column = "createTime" property = "createTime" />
+        <result column = "updateTime" property = "updateTime" />
+    </resultMap >
+	<!--新增上商品到购物车-->
+	<insert id = "saveWxUserCart" parameterType = "WxUserCart"
+	        useGeneratedKeys = "true" keyProperty = "id" >
+        INSERT into
+        user_cart(uid,oid,otype,number,create_time,update_time)
+        VALUES(#{uid},#{oid},#{otype},#{number},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+
+    </insert >
+	<!--修改购物车表信息-->
+	<update id = "updateWxUserCart" parameterType = "WxUserCart" >
+        UPDATE user_cart
+        <set >
+            <if test = "number != null" >number=#{number},</if >
+            <if test = "status != null" >status=#{status},</if >
+            update_time=CURRENT_TIMESTAMP
+        </set >
+        WHERE id =#{id}
+    </update >
+	
+	<!--修改购物车表信息,根据用户id修改所属用户所有商品勾选状态-->
+	<update id = "updateWxUserCartByUidAllStatus" >
+       UPDATE user_cart
+        <set >
+            <if test = "status != null" >status=#{status},</if >
+            update_time=CURRENT_TIMESTAMP
+        </set >
+        WHERE uid =#{uid}
+    </update >
+	
+	<!--批量:删除购物车中的商品-->
+	<delete id = "deleteWxUserCart" parameterType = "java.util.List" >
+        DELETE FROM
+        user_cart
+        WHERE id IN
+        <foreach collection = "list" item = "id" open = "(" close = ")"
+                 separator = "," >
+            #{id}
+        </foreach >
+    </delete >
+
+
+    <resultMap id = "WxUserCartResponseMap" type = "WxUserCartResponse" >
+        <result column = "id" property = "id" />
+        <result column = "uid" property = "uid" />
+        <result column = "oid" property = "oid" />
+        <result column = "cid" property = "cid" />
+        <result column = "otype" property = "otype" />
+        <result column = "number" property = "num" />
+        <result column = "status" property = "status" />
+        <result column = "sid" property = "sid" />
+        <result column = "sname" property = "sname" />
+        <result column = "pname" property = "pname" />
+        <result column = "price" property = "price" />
+        <result column = "yprice" property = "yprice" />
+        <result column = "pstatus" property = "pstatus" />
+        <result column = "imgurl" property = "imgurl" />
+        <result column = "freight" property = "freight" />
+        <result column = "fgxf" property = "fgxf" />
+        <result column = "fgtype" property = "fgtype" />
+    </resultMap >
+
+    <select id = "findWxUserCartProduct" resultMap = "WxUserCartResponseMap" >
+        SELECT uc.`Id`,uc.`uid`,uc.`oid`,uc.`otype`,uc.`number`,uc.`status`,
+        sh.`sid`,sh.`sname`,pr.`cid`,pr.`pname`,pr.`price`,pr.`yprice`,pr.`state` AS pstatus,pimg.`url` AS imgurl,
+        pr.`freight`,pr.`fg_xf` as fgxf,pr.`fg_type` as fgtype
+        FROM `user_cart` uc
+        LEFT JOIN `product` pr ON pr.`id`=uc.`oid`
+        LEFT JOIN shop sh ON pr.`sid`=sh.`sid`
+        LEFT JOIN `productimg` pimg ON pr.`id`=pimg.`pid`
+        WHERE uc.`uid`=#{uid}
+        AND uc.`otype`=0
+
+    </select >
+
+    <select id = "findWxUserCartVoucher" resultMap = "WxUserCartResponseMap" >
+        SELECT uc.`Id`,uc.`uid`,uc.`oid`,uc.`otype`,uc.`number`,uc.`status`,
+        vo.`vtitle` as pname ,vo.`vprice` as price,vo.`vimg`as imgurl,(
+        CASE
+        WHEN vo.vodate &gt; now() and vo.vstore &gt; 0 THEN
+        '1'
+        ELSE
+        '0'
+        END
+        ) pstatus
+        FROM `user_cart` uc
+        LEFT JOIN `voucher` vo ON vo.`vid`=uc.`oid`
+        WHERE uc.`uid`=#{uid}
+        AND uc.`otype`=1
+
+
+    </select >
+	
+	<!--查询购物车中是否已经存在该商品-->
+	<select id = "getWxUserCart" parameterType = "WxUserCart" resultType = "WxUserCart" >
+        SELECT uc.`Id`,uc.`uid`,uc.`oid`,uc.`otype`,uc.`number`,uc.`status`
+        FROM `user_cart` uc
+        WHERE uc.`uid`=#{uid}
+        AND uc.`oid`=#{oid}
+        AND uc.`otype`=#{otype}
+    </select >
+
+</mapper >

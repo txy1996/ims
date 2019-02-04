@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxUserAddressDao">
+
+	<resultMap id="UserAddress" type="WxUserAddress">
+		<result column="uaid" property="uaid" />
+		<result column="uauid" property="uauid" />
+		<result column="uaone" property="uaone" />
+		<result column="uaname" property="uaname" />
+		<result column="uatel" property="uatel" />
+		<result column="uaaddress" property="uaaddress" />
+	</resultMap>
+
+
+	<!--微信:新增用户地址管理 -->
+	<insert id="saveWxUserAddress" parameterType="WxUserAddress">
+		<selectKey resultType="int" order="AFTER" keyProperty="uaid">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into user_address
+		(uauid,uaone,uaname,uatel,uaaddress)
+		values(#{uauid},#{uaone},#{uaname},#{uatel},#{uaaddress})
+	</insert>
+
+	<!--微信:查询用户地址 -->
+	<select id="findWxUserAddress" parameterType="WxUserAddress"
+		resultMap="UserAddress">
+		SELECT
+		ua.`uaid`,ua.`uauid`,ua.`uaone`,ua.`uaname`,ua.`uatel`,ua.`uaaddress`
+		FROM `user_address` ua
+		WHERE ua.`uauid`=#{uauid}
+		ORDER BY ua.`uaone`
+		DESC
+	</select>
+	
+	<select id="getWxUserDefaultAddress" parameterType="WxUserAddress"
+		resultType="WxUserAddress">
+		SELECT
+		ua.`uaid`,ua.`uauid`,ua.`uaone`,ua.`uaname`,ua.`uatel`,ua.`uaaddress`
+		FROM `user_address` ua
+		WHERE ua.`uauid`=#{uauid}
+		AND ua.`uaone`=1
+	</select>
+
+	<!--微信:删除用户地址 -->
+	<delete id="deleteWxUserAddress" parameterType="int">
+		DELETE FROM
+		`user_address` WHERE uaid =#{uaid}
+	</delete>
+	<!-- 微信:修改用户地址 -->
+	<update id="updateWxUserAddress" parameterType="WxUserAddress">
+		UPDATE user_address
+		<set>
+			<if test="uaone != null">uaone=#{uaone},</if>
+			<if test="uaname != null">uaname=#{uaname},</if>
+			<if test="uatel != null">uatel=#{uatel},</if>
+			<if test="uaaddress != null">uaaddress=#{uaaddress}</if>
+		</set>
+		WHERE uaid =#{uaid}
+	</update>
+	
+	<update id="updateuaone" parameterType="Integer">
+		UPDATE user_address SET uaone = 0 WHERE uaone = 1 and uauid = #{uauid}
+	</update>
+</mapper>

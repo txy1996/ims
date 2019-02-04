@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxUser_assessDao" >
+	<resultMap id = "SetResultMap" type = "WxUser_assess" >
+		<result column = "uaid" property = "uaid" />
+		<result column = "uaoid" property = "uaoid" />
+		<result column = "uaotype" property = "uaotype" />
+		<result column = "ualabels" property = "ualabels" />
+		<result column = "uadate" property = "uadate" />
+		<result column = "uaisanonymous" property = "uaisanonymous" />
+		<result column = "uainfo" property = "uainfo" />
+		<result column = "uanum" property = "uanum" />
+		 <association property = "wxsys_user" javaType = "WxSys_user" >
+		<id column = "id" property = "id" />
+		<result column = "username" property = "username" />
+		<result column = "head" property = "head" />
+		</association >
+		<association property = "wximages_pl" javaType = "WxImagesPl" >
+		<id column = "iid" property = "iid" />
+		<result column = "plid" property = "plid" />
+		<result column = "iurl" property = "iurl" />
+		<result column = "idate" property = "idate" />
+		<result column = "tfimg" property = "tfimg" />
+		</association >
+	</resultMap >
+	
+	<!-- 对商户评论的查询 -->
+	<select id = "selectu" parameterType = "Integer" resultMap = "SetResultMap" >
+	select s.username,s.head,u.uadate,u.uainfo,u.uaisanonymous from 
+	sys_user s INNER JOIN user_assess u on s.id = u.urid 
+	where u.uaotype = 0 and u.uaoid = #{sid} limit 0,3
+	</select >
+	<!-- 查询商户更多评论 -->
+	<select id = "shopcomment" parameterType = "Integer" resultMap = "SetResultMap" >
+	select s.username,s.head,u.uadate,u.uainfo,u.uaisanonymous from 
+	sys_user s INNER JOIN user_assess u on s.id = u.urid 
+	where u.uaotype = 0 and u.uaoid = #{sid}
+	</select >
+	
+	<!-- 此sql仅用于对商品评论的查询 -->
+	<select id = "selectassess" resultMap = "SetResultMap" parameterType = "java.lang.Integer" >
+		SELECT a.`uaid`,a.uanum,s.username,s.head,a.`uaisanonymous`,a.`uainfo`,a.uadate,a.ualabels
+ 		FROM user_assess a 		
+ 		INNER JOIN sys_user s ON s.id = a.urid AND
+ 		uaoid=#{uaoid} AND uaotype=3 ORDER BY uadate ASC
+	</select >
+	
+	<select id = "selectassess1" resultMap = "SetResultMap" parameterType = "java.lang.Integer" >
+		SELECT a.`uaid`,a.uanum,s.username,s.head,a.`uaisanonymous`,a.`uainfo`,a.uadate,a.ualabels
+ 		FROM user_assess a 		
+ 		INNER JOIN sys_user s ON s.id = a.urid AND
+ 		uaoid=#{uaoid} AND uaotype=3 ORDER BY uadate DESC 
+	</select >
+	<select id = "comment" parameterType = "Integer" resultMap = "SetResultMap" >
+	<!-- select u.uaid,s.username,s.head,u.uadate,u.uainfo,u.uaisanonymous,i.iid,i.iurl from user_assess u inner join sys_user s on s.id = u.urid 
+INNER JOIN images_pl i on u.uaid = i.plid where u.uaoid = #{id} and u.uaotype= 3 limit 0,3 -->
+select u.uaid,s.username,s.head,u.uadate,u.uanum,u.uaisanonymous,i.iid,i.iurl from user_assess u inner join sys_user s on s.id = u.urid 
+INNER JOIN images_pl i on u.uaid = i.plid where u.uaoid = #{id} and u.uaotype= 3 limit 0,3
+	</select >
+	
+	
+	<!-- 查询商品更多评论 -->
+	<select id = "productcomment" parameterType = "Integer" resultMap = "SetResultMap" >
+	select u.uaid,s.username,s.head,u.uadate,u.uainfo,u.uaisanonymous,i.iid,i.iurl from user_assess u 
+	inner join sys_user s on s.id = u.urid 
+    INNER JOIN images_pl i on u.uaid = i.plid
+    where u.uaoid = #{id} and u.uaotype= 3 
+    ORDER BY u.uaid DESC
+	</select >
+	
+	<!-- 查询评论总条数 -->
+	<select id="total" parameterType = "Integer" resultType="Integer">
+	select count(uaoid) from user_assess where uaoid = #{id}
+	</select>
+	<!-- 查询评论总分值 -->
+	<select id="commentsum" parameterType = "Integer" resultType="Integer">
+	select sum(uanum) from user_assess where uaoid = #{id}
+	</select>
+	<select id = "selectassessimg" resultType = "String" parameterType = "java.lang.Integer" >
+		SELECT b.`iurl`
+ 		FROM user_assess a 
+ 		INNER JOIN images_pl b ON a.`uaid`=b.`plid` 
+ 		INNER JOIN sys_user s ON s.id = a.urid AND
+ 		uaid=#{uaid} AND uaotype=3
+	</select >
+	
+	
+	<resultMap id = "WxUserAssessMap" type = "WxUserAssess" >
+        <result column = "uaid" property = "uaid" />
+        <result column = "urid" property = "urid" />
+        <result column = "uaoid" property = "uaoid" />
+        <result column = "uaotype" property = "uaotype" />
+        <result column = "ualabels" property = "ualabels" />
+        <result column = "uadate" property = "uadate" />
+        <result column = "uaisanonymous" property = "uaisanonymous" />
+        <result column = "uainfo" property = "uainfo" />
+        <result column = "uanum" property = "uanum" />
+        <result column = "username" property = "username" />
+        <result column = "head" property = "head" />
+    </resultMap >
+	<!--新增用户评论-->
+	<insert id = "saveWxUserAssess" parameterType = "WxUserAssess" >
+		<selectKey resultType = "int" order = "AFTER" keyProperty = "uaid" >
+			SELECT LAST_INSERT_ID()
+		</selectKey >
+        INSERT into
+        user_assess(urid,uaoid,uaotype,ualabels,uadate,uaisanonymous,uainfo,uanum)
+        VALUES(#{urid},#{uaoid},#{uaotype},#{ualabels},CURRENT_TIMESTAMP,#{uaisanonymous},#{uainfo},#{uanum})
+    </insert >
+	
+	<!--根据评论的对象与类型查询评论列表-->
+	<select id = "findWxUserAssessByUaoid" resultMap = "WxUserAssessMap" >
+		SELECT ua.`uaid`,ua.`urid`,ua.`uaoid`,ua.`uaotype`,ua.`ualabels`,ua.`uadate`,
+		ua.`uaisanonymous`,ua.`uainfo`,ua.`uanum`,su.`username`,su.`head`
+		FROM `user_assess` ua
+		LEFT JOIN `sys_user` su ON ua.`urid`=su.`id`
+		WHERE ua.`uaotype`=#{uaotype}
+		AND ua.`uaoid`=#{uaoid}
+		ORDER BY ua.`uaid` DESC
+	</select >
+</mapper >

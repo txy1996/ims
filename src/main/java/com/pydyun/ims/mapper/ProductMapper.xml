@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.ProductDao" >
+	<resultMap id = "BaseResultMap" type = "Product" >
+		<id column = "id" property = "id" />
+		<result column = "pname" property = "pname" />
+		<result column = "cid" property = "cid" />
+		<result column = "sid" property = "sid" />
+		<result column = "spunum" property = "spunum" />
+		<result column = "stock" property = "stock" />
+		<result column = "pcode" property = "pcode" />
+		<result column = "property" property = "property" />
+		<result column = "price" property = "price" />
+		<result column = "yprice" property = "yprice" />
+		<result column = "info" property = "info" />
+		<result column = "state" property = "state" />
+		<result column = "ptitle" property = "ptitle" />
+		<result column = "psad" property = "psad" />
+		<result column = "pxd" property = "pxd" />
+		<result column = "freight" property = "freight" />
+		<result column = "fg_xf" property = "fg_xf" />
+		<result column = "fg_type" property = "fg_type" />
+		<result column = "stime" property = "stime" />
+		<result column = "sutime" property = "sutime" />
+		<result column = "sparefieldone" property = "sparefieldone" />
+		<result column = "sparefieldtwo" property = "sparefieldtwo" />
+		<result column = "sparefieldthree" property = "sparefieldthree" />
+		<association property="img" javaType="Productimg">
+		<result column="url" property="url" /> 
+		</association>
+	</resultMap >
+<select id="plist" resultMap = "BaseResultMap">
+	select p.id,p.pname,pro.url from product p INNER JOIN productimg pro on p.id = pro.pid 
+where 1=1 and p.id in (${_parameter})
+	</select>
+<delete id="deletepro" parameterType="Integer">
+delete from product where id = #{id}
+</delete>
+
+	<resultMap id = "BaseResponseMap" type = "ProductResponse" >
+		<id column = "id" property = "id" />
+		<result column = "pname" property = "pname" />
+		<result column = "cid" property = "cid" />
+		<result column = "cname" property = "cname" />
+		<result column = "sid" property = "sid" />
+		<result column = "sname" property = "sname" />
+		<result column = "stock" property = "stock" />
+		<result column = "spunum" property = "spunum" />
+		<result column = "state" property = "state" />
+		<result column = "ptitle" property = "ptitle" />
+		<result column = "psad" property = "psad" />
+		<result column = "sparefieldone" property = "sparefieldone" />
+		<result column = "sparefieldtwo" property = "sparefieldtwo" />
+		<result column = "sparefieldthree" property = "sparefieldthree" />
+	</resultMap >
+	<select id="selectPro" resultMap = "BaseResponseMap">
+	SELECT
+		sh.sname,pc.cname,pr.pname,pr.spunum,pr.stock,pr.state
+		FROM
+		product pr,shop sh,productclass pc
+    where 1=1
+    <if test="choise != null">
+    and pr.ptitle &lt; #{choise}
+    </if>
+    and sh.sid=pr.sid and pr.cid = #{scid} and pc.id = #{scid}
+	</select>
+	<!--查询商品 -->
+	<select id = "selectProduct" resultMap = "BaseResponseMap" >
+		SELECT
+		pc.`cname`,sh.`sname`,
+		pr.*
+		FROM
+		product pr
+		LEFT JOIN shop sh ON sh.`sid`=pr.`sid`
+		LEFT JOIN productclass
+		pc ON pc.`id`=pr.`cid`
+		<where >
+			<if test = "sname !=null" >
+				and sh.sname like concat('%',concat(#{sname},'%'))
+			</if >
+			<if test = "pname !=null" >
+				and pr.`pname` like concat('%',concat(#{pname},'%'))
+			</if >
+			<if test = "stock !=null" >
+				and pr.`stock` =#{stock}
+			</if >
+			<if test = "state !=null" >
+				and pr.`state` =#{state}
+			</if >
+			<if test = "sid !=null" >
+				and sh.`sid` =#{sid}
+			</if >
+			<if test = "pcid !=null" >
+				and pc.id =#{pcid}
+			</if >
+		</where >
+		ORDER BY pr.id DESC
+	</select >
+	<!--根据id查询商品详情 -->
+	<select id = "selectProductById"
+	        resultType = "ProductUpdateResponse" >
+		SELECT
+		pr.`id`,pc.`cname`,sh.`sname`,
+		pr.`info`,pr.`yprice`,pr.`price`,
+		pr.`property`,pr.`pcode`,
+		py.ptyname,py.ptyid,
+		pr.`pname`,pr.`cid`,pr.`sid`,pr.`spunum`,pr.`stock`,pr.`state`,
+		pr.ptitle,pr.psad,pr.pxd,pr.freight,
+		pr.fg_xf,pr.fg_type,pr.stime,pr.sutime,
+		pr.sparefieldone,pr.sparefieldtwo,pr.sparefieldtwo,
+		pimg.`id`
+		AS imgid ,pimg.`name`
+		AS imgname,pimg.`url`
+		FROM
+		product pr
+		LEFT JOIN shop
+		sh ON sh.`sid`=pr.`sid`
+		LEFT JOIN productclass pc ON pc.`id`=pr.`cid`
+		LEFT JOIN `productimg` pimg ON pr.`id`=pimg.pid
+		LEFT JOIN (SELECT
+		pt.id
+		AS id,
+		GROUP_CONCAT(CONCAT(py.name)) AS ptyname,
+		GROUP_CONCAT(CONCAT(py.id)) AS ptyid
+		FROM
+		`property` py
+		LEFT JOIN
+		`product` pt ON FIND_IN_SET(py.id,pt.property)
+		GROUP BY pt.id) py ON
+		py.id=pr.`id`
+		WHERE pr.id=#{id}
+	</select >
+	
+	<!-- 新增商品 -->
+	<insert id = "addProduct" parameterType = "Product" >
+		<selectKey resultType = "int" order = "AFTER" keyProperty = "id" >
+			SELECT LAST_INSERT_ID()
+		</selectKey >
+		INSERT INTO
+		product(pname,cid,sid,spunum,stock,pcode,property,price,yprice,info,state,ptitle,psad,pxd,freight,fg_xf,fg_type,stime,sutime,sparefieldone,sparefieldtwo,sparefieldthree)
+		VALUES(#{pname},#{cid},#{sid},#{spunum},#{stock},#{pcode},#{property},#{price},#{yprice},#{info},#{state}
+		,#{ptitle},#{psad},#{pxd},#{freight},#{fg_xf},#{fg_type},#{stime},#{sutime},#{sparefieldone},#{sparefieldtwo},#{sparefieldthree})
+	</insert >
+	
+	<!--编辑商品 -->
+	<update id = "updateProduct" parameterType = "Product" >
+		UPDATE product
+		<set >
+			<if test = "pname != null" >pname=#{pname},</if >
+			<if test = "cid != null" >cid=#{cid},</if >
+			<if test = "spunum != null" >spunum=#{spunum},</if >
+			<if test = "stock != null" >stock=#{stock},</if >
+			<if test = "property != null" >property=#{property},</if >
+			<if test = "price != null" >price=#{price},</if >
+			<if test = "yprice != null" >yprice=#{yprice},</if >
+			<if test = "info != null" >info=#{info},</if >
+			<if test = "state != null" >state=#{state},</if >
+			<if test = "pcode != null" >pcode=#{pcode},</if >
+			<if test = "ptitle != null" >ptitle=#{ptitle},</if >
+			<if test = "psad != null" >psad=#{psad},</if >
+			<if test = "pxd != null" >pxd=#{pxd},</if >
+			<if test = "freight != null" >freight=#{freight},</if >
+			<if test = "fg_xf != null" >fg_xf=#{fg_xf},</if >
+			<if test = "fg_type != null" >fg_type=#{fg_type},</if >
+			<if test = "stime != null" >stime=#{stime},</if >
+			<if test = "sutime != null" >sutime=#{sutime},</if >
+			<if test = "sparefieldone != null" >sparefieldone=#{sparefieldone},</if >
+			<if test = "sparefieldtwo != null" >sparefieldtwo=#{sparefieldtwo},</if >
+			<if test = "sparefieldthree != null" >sparefieldthree=#{sparefieldthree},</if >
+			sutime=CURRENT_TIMESTAMP
+		</set >
+		WHERE id = #{id}
+	</update >
+
+	<select id="findcid" parameterType="Integer" resultType="Integer">
+		select cid from product where id=#{id}
+	</select>
+	
+	
+	<resultMap id = "ProductInfoResponseMap" type = "ProductInfoResponse" >
+		<result column = "id" property = "id" />
+		<result column = "pname" property = "pname" />
+		<result column = "cid" property = "cid" />
+		<result column = "sid" property = "sid" />
+		<result column = "price" property = "price" />
+		<result column = "yprice" property = "yprice" />
+		<result column = "url" property = "url" />
+		<result column = "sname" property = "sname" />
+		<result column = "stel" property = "stel" />
+	</resultMap >
+	
+	<select id="findProductByIds"  resultMap="ProductInfoResponseMap">
+		SELECT pt.`id`,pt.`pname`,pt.`cid`,pt.`sid`,pt.`price`,pt.`yprice`,
+		pg.`url`,sh.`sname`,sh.`stel`
+		FROM `product` pt
+		LEFT JOIN `productimg` pg ON pt.`id`=pg.`pid`
+		LEFT JOIN `shop` sh ON pt.`sid`=sh.`sid`
+		WHERE pt.`id`IN
+		 <foreach collection = "ids" item = "id" open = "(" close = ")"
+		          separator = "," >
+            #{id}
+        </foreach >
+	</select>
+
+</mapper >

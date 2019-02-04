@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.UserAssessDao">
+
+	<resultMap id="UserAssessResultMap" type="UserAssess">
+		<id column="uaid" property="uaid" />
+		<result column="urid" property="urid" />
+		<result column="faid" property="faid" />
+		<result column="shopid" property="shopid" />
+		<result column="ualabels" property="ualabels" />
+		<result column="uadate" property="uadate" />
+		<result column="uaisanonymous" property="uaisanonymous" />
+		<result column="uainfo" property="uainfo" />
+		<result column="uanum" property="uanum" />
+
+		<collection property="Label"
+			ofType="com.pydyun.ims.model.Label">
+			<!-- id:订单明细唯一标识 property:要将订单明细的唯一标识映射到cn.higgin.mybatis.po.Orderdetail的对应属性 -->
+			<id column="lid" property="lid" />
+			<result column="urid" property="urid" />
+			<result column="lcid" property="lcid" />
+			<result column="lcinfo" property="lcinfo" />
+			<result column="lcdate" property="lcdate" />
+			<association property="labelclass" javaType="Label_class">
+				<id column="lcid" property="lcid" />
+				<result column="lclcid" property="lclcid" />
+				<result column="lcname" property="lcname" />
+			</association>
+		</collection>
+
+	</resultMap>
+
+
+	<resultMap id="UserAssessPageResultMap"
+		type="UserAssessPageResponse">
+		<id column="uaid" property="uaid" />
+		<result column="username" property="username" />
+		<result column="uaoid" property="uaoid" />
+		<result column="uaotype" property="uaotype" />
+		<result column="uadate" property="uadate" />
+		<result column="uaisanonymous" property="uaisanonymous" />
+		<result column="ualabels" property="ualabels" />
+		<result column="uainfo" property="uainfo" />
+		<result column="uanum" property="uanum" />
+		<result column="schemename" property="schemename" />
+		<result column="shopname" property="shopname" />
+		<result column="stage" property="stage" />
+		<result column="pname" property="pname" />
+
+	</resultMap>
+
+
+	<select id="select" resultMap="UserAssessPageResultMap">
+		SELECT
+		ua.`uaid`,ua.`uadate`,ua.`uaisanonymous`,ua.`uainfo`,ua.`uanum`,
+		ua.`uaoid`,ua.`uaotype`,su.`username`,las.ualabels,sh.`sname` as
+		shopname,
+		sch.`sname`AS schemename ,sst.`ssname` AS stage ,pr.`pname`
+		FROM `user_assess` ua
+		LEFT JOIN `sys_user` su ON ua.`urid`=su.`id`
+		LEFT
+		JOIN `shop` sh ON ua.`uaoid`=sh.`sid`
+		LEFT JOIN `scheme` sch ON
+		ua.`uaoid`=sch.`sid`
+		LEFT JOIN `scheme_stage` sst ON
+		ua.`uaoid`=sst.`ssid`
+		LEFT JOIN `product` pr ON ua.`uaoid`=pr.`id`
+		LEFT
+		JOIN (SELECT ua.`uaid` AS uaid ,GROUP_CONCAT(la.lcinfo) AS ualabels
+		FROM `user_assess` ua
+		LEFT JOIN `label` la ON
+		FIND_IN_SET(la.lid,ua.ualabels) GROUP BY
+		ua.`uaid`)las
+		ON
+		ua.`uaid`=las.uaid
+		<where>
+			<if test="uanum !=null">
+				and uanum=#{uanum}
+			</if>
+			<if test="uaoid !=null">
+				AND ua.`uaoid`=#{uaoid}
+				AND ua.`uaotype`=3
+			</if>
+			<if test="urid !=null">
+				and su.`id`=#{urid}
+			</if>
+			<if test="uaotype !=null">
+				and ua.`uaotype`=#{uaotype}
+			</if>
+			<if test="username !=null">
+				and username like concat('%',concat(#{username},'%'))
+			</if>
+			<if test="schemename !=null">
+				and sc.sname like concat('%',concat(#{schemename},'%'))
+			</if>
+			<if test="shopname !=null">
+				and sh.sname like concat('%',concat(#{shopname},'%'))
+			</if>
+			<if test="pname !=null">
+				and pr.`pname` like concat('%',concat(#{pname},'%'))
+			</if>
+			<if test="stage !=null">
+				and sst.`ssname` like concat('%',concat(#{stage},'%'))
+			</if>
+		</where>
+		GROUP BY ua.`uaid` DESC
+	</select>
+
+</mapper>

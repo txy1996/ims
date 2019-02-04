@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.ShopLevelDao">
+	<resultMap id="SetResultMap" type="ShopLevel">
+		<result column="slid" property="slid" />
+		<result column="slname" property="slname" />
+		<result column="slintegration" property="slintegration" />
+		<result column="slinfo" property="slinfo" />
+
+	</resultMap>
+	<select id="selectshop" resultMap="SetResultMap">
+		select slid,slname,slintegration,slinfo from shop_level
+	</select>
+	<delete id="delete" parameterType="int">
+	delete from shop_level where slid = #{slid}
+	</delete>
+	<select id="getLevel" parameterType="int" resultMap="SetResultMap">
+	select * from shop_level where slid = #{slid}
+	</select>
+	<update id="update" parameterType="ShopLevel">
+	update shop_level
+	<set>
+	        <if test="slname != null">slname=#{slname},</if>
+			<if test="slintegration != null">slintegration=#{slintegration},</if>
+			<if test="slinfo != null">slinfo=#{slinfo},</if>
+	</set>
+	where slid = #{slid}
+	</update>
+	<insert id="add" parameterType="ShopLevel" useGeneratedKeys="true"
+		keyProperty="slid">
+	insert into shop_level (slid,slname,slintegration,slinfo) values (#{slid},#{slname},#{slintegration},#{slinfo})
+	</insert>
+	</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.LabelClassDao">
+
+	<resultMap id="labelclassResultMap" type="Label_class">
+		<result column="lcid" property="lcid" />
+		<result column="lclcid" property="lclcid" />
+		<result column="lcname" property="text" />
+		<collection property="label"
+			ofType="com.pydyun.ims.model.Label">
+			<!-- id:订单明细唯一标识 property:要将订单明细的唯一标识映射到cn.higgin.mybatis.po.Orderdetail的对应属性 -->
+			<id column="lid" property="lid" />
+			<result column="urid" property="urid" />
+			<result column="lcid" property="lcid" />
+			<result column="lcinfo" property="lcinfo" />
+			<result column="lcdate" property="lcdate" />
+			<association property="labelclass" javaType="Label_class">
+				<id column="lcid" property="lcid" />
+				<result column="lclcid" property="lclcid" />
+				<result column="lcname" property="text" />
+			</association>
+		</collection>
+
+	</resultMap>
+
+	<select id="select" resultType="com.pydyun.ims.model.Label_class">
+		<!-- SELECT
+		lab.`lcdate`,lab.`lcinfo`,lab.`lid`,lab.`urid`,
+		lac.lcid,lac.`lclcid`,lac.lcname
+		FROM
+		label_class lac
+		LEFT JOIN
+		label lab
+		ON
+		lac.`lcid`=lab.`lcid`
+		ORDER BY lac.lcid DESC -->
+		select lcid,lclcid,lcname AS TEXT from label_class ORDER BY getPriority(lcid) asc
+	</select>
+
+	<select id="getByLclcid"
+		resultType="com.pydyun.ims.model.Label_class">
+		SELECT
+		lac.lcid,lac.`lclcid`,lac.lcname
+		FROM label_class lac
+		WHERE
+		lac.lcid=#{lcid}
+	</select>
+
+	<insert id="add" parameterType="Label_class"
+		useGeneratedKeys="true" keyProperty="lcid">
+		insert into label_class
+		(lcid,lclcid,lcname) values
+		(#{lcid},#{lclcid},#{text})
+	</insert>
+
+	<delete id="delete" parameterType="int">
+		delete label_class from
+		label_class where lcid = #{lcid}
+	</delete>
+
+	<update id="update" parameterType="label_class">
+		update label_class
+		<set>
+			<if test="lclcid != null">lclcid=#{lclcid},</if>
+			<if test="lcname != null">lcname=#{text},</if>
+		</set>
+		where lcid = #{lcid}
+	</update>
+
+	<select id="findscscid" parameterType="int" resultType="com.pydyun.ims.model.Label_class">
+		select * from label_class where lclcid=#{lclcid}
+	</select>
+	
+	<select id="findid" parameterType="string" resultType="int">
+		select lcid from label_class where lcname=#{text}
+	</select>
+	
+	<select id="findlclcname" resultType="String">
+		SELECT lcname FROM label_class WHERE lcid=#{lcid}
+	</select>
+</mapper>

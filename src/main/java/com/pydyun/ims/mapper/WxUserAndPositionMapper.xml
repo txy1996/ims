@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxUserAndPositionDao">
+
+	<resultMap id="SetResultMap" type="WxUserAndPosition">
+		<result column="upid" property="upid" />
+		<result column="urid" property="urid" />
+		<result column="cid" property="cid" />
+		<result column="pid" property="pid" />
+		<result column="upsort" property="upsort" />
+		<result column="upsdate" property="upsdate" />
+		<result column="upodate" property="upodate" />
+	</resultMap>
+
+
+	<!--微信:用户与公司职位关系 -->
+	<insert id="saveWxUserAndPosition"
+		parameterType="WxUserAndPosition">
+		<selectKey resultType="int" order="AFTER" keyProperty="upid">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into `user_position`
+		(urid,cid,pid,upsort,upsdate,upodate)
+		values(#{urid},#{cid},#{pid},#{upsort},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+	</insert>
+
+	<!--微信:查询用户与公司职位关系 -->
+	<select id="findWxUserAndPosition"
+		parameterType="WxUserAndPosition" resultType="WxUserAndPosition">
+		select
+		up.`upid`,up.`urid`,up.`cid`,up.`pid`,up.`upsort`,up.`upsdate`,up.`upodate`
+		from `user_position` up
+		where up.`urid`=#{urid}
+	</select>
+
+	<!--微信:删除用户与公司职位关系-->
+	<delete id="deleteWxUserAndPosition" parameterType="int">
+		DELETE FROM
+		`user_position`
+		WHERE upid =#{upid}
+	</delete>
+	<!-- 微信:修改用户与公司职位关系 -->
+	<update id="updateWxUserAndPosition" parameterType="WxUserAndPosition">
+		UPDATE user_position
+		<set>
+			<if test="cid != null">cid=#{cid},</if>
+			<if test="pid != null">pid=#{pid},</if>
+			<if test="upsort != null">upsort=#{upsort},</if>
+			<if test="upodate != null">upodate=#{upodate}</if>
+		</set>
+		WHERE upid =#{upid}
+	</update>
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.PropertyDao">
+
+	<select id="selectBypcid" parameterType="int" resultType="Property">
+		SELECT * FROM property WHERE pcid=#{pcid}
+	</select>
+
+	<delete id="delete" parameterType="int">
+		DELETE FROM property  WHERE id =#{id}
+	</delete>
+	
+	<select id="selectall" resultType="Property">
+		SELECT * FROM property GROUP BY NAME
+	</select>
+	
+	<insert id="insert" parameterType="Property" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into property (id,name,pcid,pid,propertyvalue)
+		values(#{id},#{name},#{pcid},#{pid},#{propertyvalue})
+	</insert>
+	
+	<delete id="deleteproperty" parameterType="int">
+		DELETE FROM property WHERE pcid=#{pcid}
+	</delete>
+</mapper>

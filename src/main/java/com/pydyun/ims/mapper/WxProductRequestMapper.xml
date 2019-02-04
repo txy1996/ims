@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxProductRequestDao">
+	<resultMap id="SetResultMap" type="WxProductRequest">
+		<result column="pname" property="pname" /> 
+		<result column="id" property="id" />
+		<result column="cid" property="cid" />
+		<result column="sid" property="sid" />
+		<result column="info" property="info" />
+		<result column="price" property="price" />
+		<result column="yprice" property="yprice" />
+		<result column="property" property="property" />
+		<result column="ptitle" property="ptitle" />
+		<result column="psad" property="psad" />
+		<result column="sparefieldone" property="sparefieldone" />
+		<result column="sparefieldtwo" property="sparefieldtwo" />
+		<result column="sparefieldthree" property="sparefieldthree" />
+		<association property="wxshop" javaType="WxProductShop">
+		<id column="sid" property="sid" />
+		<result column="sname" property="sname" />
+		<result column="slogo" property="slogo" />
+		<result column="sinfo" property="sinfo" />
+		<result column="stel" property="stel" />
+		<result column="saddress" property="saddress" />
+		</association>
+		<association property="wximg" javaType="WxProductimg">
+		<result column="url" property="url" /> 
+		</association>
+		<association property="wxlabel" javaType="WxLabel">
+			<result column="lcinfo" property="lcinfo" />
+		</association>
+		<association property="wxvou"  javaType="WxVoucherRequest">
+		<result column="vimg" property="vimg" />
+		</association>
+		<association property="wclas"  javaType="WxProductClas">
+		<result column="pid" property="cid" />
+		</association>
+	</resultMap>
+
+<select id="shoplist" parameterType="Integer" resultMap="SetResultMap">
+select s.sid,s.sname,s.saddress,s.stel,p.cid,p.id,p.pname,p.price,p.yprice,p.ptitle,s.slogo from product p  
+INNER JOIN shop s on p.sid = s.sid  and p.cid = #{id}
+<!-- <if test="ptitle1 !=null">
+	AND p.`ptitle` &gt;= ${ptitle1}
+</if>
+<if test="ptitle2 !=null">
+	AND p.`ptitle` &lt;= ${ptitle2}
+</if>
+<if test="ptitle3 !=null">
+	AND p.`ptitle` like '%${ptitle3}%'
+</if> -->
+<!-- <if test="timechoise !=null">
+	AND p.`property` LIKE '%:${timechoise}%'
+</if>
+<if test="naturechoise !=null">
+	AND p.`property` LIKE '%:${naturechoise}%'
+</if> -->
+</select>
+
+<!-- 查询商品类型方案 -->
+<select id="schema" resultMap="SetResultMap">
+select p.id,s.sname,p.pname,p.price,p.yprice,pro.url from product p INNER JOIN productimg pro on p.id = pro.pid INNER JOIN shop s on p.sid = s.sid 
+and p.cid = #{id}
+<if test="ptitle1 !=null">
+	AND p.`ptitle` &gt;= ${ptitle1}
+</if>
+<if test="ptitle2 !=null">
+	AND p.`ptitle` &lt;= ${ptitle2}
+</if>
+</select>
+<select id="shoplisth" resultMap="SetResultMap">
+select s.sid,s.sname,s.saddress,s.stel,p.id,p.cid,p.pname,p.price,p.yprice,p.ptitle,s.slogo from product p  
+INNER JOIN shop s on p.sid = s.sid  and p.cid in (${_parameter})
+
+</select>
+<!-- 查询推荐聚餐 -->
+<select id="restaurant" parameterType="Integer" resultMap="SetResultMap">
+select p.*,pro.url,pr.cid as pid,s.* from product p INNER JOIN (select id,cid from productclass where cid = #{id})pr on p.cid = pr.id 
+INNER JOIN productimg pro on p.id = pro.pid
+INNER JOIN shop s ON p.sid = s.sid
+GROUP BY
+	CONCAT(p.`cid`, p.`id` % 3) LIMIT 0,12
+</select>
+
+<select id="listsang" parameterType="Integer" resultMap="SetResultMap">
+select p.*,pro.url,pr.cid as pid,s.* from product p INNER JOIN (select id,cid from productclass where cid = #{id1})pr on p.cid = pr.id 
+INNER JOIN productimg pro on p.id = pro.pid 
+INNER JOIN shop s ON p.sid = s.sid
+GROUP BY
+	CONCAT(p.`cid`, p.`id` % 3)
+</select>
+
+<select id="listtravel" parameterType="Integer" resultMap="SetResultMap">
+select p.*,pro.url,pr.cid as pid,s.* from product p INNER JOIN (select id,cid from productclass where cid = #{id2})pr on p.cid = pr.id 
+INNER JOIN productimg pro on p.id = pro.pid 
+INNER JOIN shop s ON p.sid = s.sid
+GROUP BY
+	CONCAT(p.`cid`, p.`id` % 3)
+</select>
+<!-- 查询会议培训 -->
+<select id="productclass" parameterType="Integer" resultMap="SetResultMap">
+select p.pname,p.id,p.cid,pro.url from product p INNER JOIN (select id,cid from productclass where cid = #{id})pr on p.cid = pr.id 
+INNER JOIN productimg pro on p.id = pro.pid
+GROUP BY
+	CONCAT(p.`cid`, p.`id` % 3) LIMIT 0,12
+
+</select>
+<select id="adviser" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.sid,p.pname,p.price,p.yprice,p.info,p.property,s.sname,s.slogo,pro.url from product p INNER JOIN shop s on p.sid = s.sid 
+INNER JOIN productimg pro on p.id = pro.pid where p.id = #{id}
+</select>
+
+<!-- 推荐商品理由查询 -->
+<select id="forward" parameterType="Integer" resultMap="SetResultMap">
+select l.lcinfo from product p INNER JOIN label_product_sum la on p.id = la.pid INNER JOIN label l on la.lid = l.lid and la.pid = #{id}
+</select>
+<!-- 推荐讲师查询 -->
+<select id="teacher" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.cid,p.pname,pro.url from product p INNER JOIN productimg pro on p.id = pro.pid and p.cid in (select id from productclass where cid = 
+(select cid from productclass where id = (select cid from product where id = #{id})))
+</select>
+<!--查询此商家对应其他产品  -->
+<select id="adviserId"  resultMap="SetResultMap">
+select p.id,p.cid,p.pname,pro.url from product p INNER JOIN productimg pro on p.id = pro.pid where 1=1 and
+p.sid = #{id} and p.id != #{id1}
+</select>
+
+<select id="Besimilar"  resultMap="SetResultMap">
+select p.id,p.cid,p.sid,p.pname,p.price,p.yprice,pro.url from product p 
+INNER JOIN productimg pro on p.id = pro.pid and p.cid = (select cid from product where id = #{id}) and p.id != #{id}
+</select>
+
+<select id="morelecturer" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.cid,p.pname,p.psad,pro.url,s.sname from product p  INNER JOIN productimg pro on p.id = pro.pid INNER JOIN shop s on
+p.sid = s.sid  and p.cid = #{id}
+<!-- <if test="ptitle1 !=null">
+	AND p.`ptitle` &gt;= ${ptitle1}
+</if>
+<if test="ptitle2 !=null">
+	AND p.`ptitle` &lt;= ${ptitle2}
+</if> -->
+<!-- <if test="timechoise !=null">
+	AND p.`property` LIKE '%:${timechoise}%'
+</if>
+<if test="naturechoise !=null">
+	AND p.`property` LIKE '%:${naturechoise}%'
+</if> -->
+</select>
+<!-- 场地列表页面,sparefieldone字段为适用对象,Ptitle字段用作容纳人数 -->
+<select id="morecourse" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.cid,p.pname,p.price,p.yprice,p.psad,pro.url,s.sid,s.sname from product p  INNER JOIN productimg pro on p.id = pro.pid INNER JOIN shop s on
+p.sid = s.sid  and p.cid  =  #{id}
+<!-- <if test="ptitle1 !=null">
+	AND p.`ptitle` &gt;= ${ptitle1}
+</if>
+<if test="ptitle2 !=null">
+	AND p.`ptitle` &lt;= ${ptitle2}
+</if>
+<if test="ptitle3 !=null">
+	AND p.`ptitle` like '%${ptitle3}%'
+</if> -->
+<!-- <if test="timechoise !=null">
+	AND p.`property` LIKE '%:${timechoise}%'
+</if>
+<if test="naturechoise !=null">
+	AND p.`property` LIKE '%:${naturechoise}%'
+</if> -->
+</select>
+
+<select id="specificourse" parameterType="Integer" resultMap="SetResultMap">
+select p.id,s.sname,s.slogo,p.cid,p.sid,p.pname,p.price,p.yprice,p.info,pro.url,p.ptitle from product p INNER JOIN shop s on p.sid = s.sid 
+INNER JOIN productimg pro on p.id = pro.pid and p.id = #{id}
+</select>
+
+<!-- 场地详情页面,sparefieldone字段用作场地面积大小,Ptitle字段用作容纳人数 -->
+<select id="details" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.cid,p.sid,s.sname,s.saddress,s.stel,s.slogo,p.pname,p.price,p.yprice,p.Ptitle,p.sparefieldone,p.property,p.info,pro.url from product p INNER JOIN shop s on p.sid = s.sid 
+INNER JOIN productimg pro on p.id = pro.pid where p.id = #{id}
+</select>
+<!-- 查看更多场地 -->
+<select id="Moresites" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.cid,s.saddress,p.pname,p.price,p.yprice,p.ptitle,pro.url from product p  INNER JOIN productimg pro on p.id = pro.pid INNER JOIN shop s
+on s.sid = p.sid and p.cid = #{id}
+<if test="ptitle1 !=null">
+	AND p.`ptitle` &gt;= ${ptitle1}
+</if>
+<if test="ptitle2 !=null">
+	AND p.`ptitle` &lt;= ${ptitle2}
+</if>
+<!-- <if test="timechoise !=null">
+	AND p.`property` LIKE '%:${timechoise}%'
+</if>
+<if test="naturechoise !=null">
+	AND p.`property` LIKE '%:${naturechoise}%'
+</if> -->
+</select>
+
+<!-- 查询配套列表 -->
+<select id="Matching" resultMap="SetResultMap">
+select p.id,p.cid,p.pname,p.psad,p.price,pro.url from product p  INNER JOIN productimg pro on p.id = pro.pid and p.cid = #{id}
+
+<!-- <if test="ptitle1 !=null">
+	AND p.`ptitle` &gt;= ${ptitle1}
+</if>
+<if test="ptitle2 !=null">
+	AND p.`ptitle` &lt;= ${ptitle2}
+</if> -->
+</select>
+<!-- 查询配套详情 -->
+<select id="XqMatching" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.cid,p.sid,p.pname,p.info,s.sname,s.saddress,s.stel,pro.url from product p  INNER JOIN productimg pro on p.id = pro.pid INNER JOIN shop s on p.sid = s.sid
+ and p.id = #{id}
+</select>
+<!-- 查询出游列表(如:当季IDEA,近郊短游,出去浪) -->
+<select id="Travel" resultMap="SetResultMap">
+select p.id,p.cid,p.pname,p.psad,p.price,p.yprice,pro.url from product p  INNER JOIN productimg pro on p.id = pro.pid and p.cid = #{id}
+<!-- <if test="ptitle1 !=null">
+	AND p.`ptitle` &gt;= ${ptitle1}
+</if>
+<if test="ptitle2 !=null">
+	AND p.`ptitle` &lt;= ${ptitle2}
+</if> -->
+</select>
+
+
+<!-- 旅游详情页面数据,Ptitle字段用作容纳人数 -->
+<select id="Traveldetails" parameterType="Integer" resultMap="SetResultMap">
+select p.id,p.pname,p.info,p.price,p.yprice,p.Ptitle,pro.url,s.sid,s.sname,s.slogo from product p INNER JOIN productimg pro on p.id = pro.pid 
+INNER JOIN shop s on p.sid = s.sid  where p.id = #{id}
+</select>
+
+<!-- 首页为你推荐模块 -->
+<select id="lbshop" resultMap="SetResultMap">
+select p.id,p.cid,p.sid,p.pname,p.psad,p.price,p.yprice,pro.url from product p INNER JOIN productimg pro on p.id = pro.pid 
+where 1=1 and p.id in (${_parameter})
+</select>
+<!-- 查询分类id -->
+<select id="productfid" parameterType="Integer" resultMap="SetResultMap">
+select p.cid from product p
+where 1=1 and p.id = #{id}
+</select>
+
+<select id="wshop" resultMap="SetResultMap">
+select p.id,p.cid,p.sid,p.pname,p.psad,p.price,p.yprice,pro.url from product p INNER JOIN productimg pro on p.id = pro.pid 
+where 1=1 and p.id in (${_parameter}) 
+</select>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxSchemeRecordingDao" >
+	<resultMap id = "WxSchemeRecordingMap" type = "WxSchemeRecording" >
+		<id column = "srid" property = "srid" />
+		<result column = "urid" property = "urid" />
+		<result column = "sid" property = "sid" />
+		<result column = "date" property = "date" />
+		<result column = "status" property = "status" />
+		<result column = "username" property = "username" />
+	</resultMap >
+	<!--新增方案记录-->
+	<insert id = "saveWxSchemeRecording"
+	        parameterType = "WxSchemeRecording" >
+		INSERT INTO
+			scheme_recording (urid, sid, date, phone, username)
+		VALUES (#{urid}, #{sid}, CURRENT_TIMESTAMP, #{phone}, #{username})
+	</insert >
+	
+	<resultMap id = "WxSchemeRecordingResponseMap" type = "WxSchemeRecordingResponse" >
+		<id column = "srid" property = "srid" />
+		<result column = "urid" property = "urid" />
+		<result column = "sid" property = "sid" />
+		<result column = "date" property = "date" />
+		<result column = "username" property = "username" />
+		<result column = "sname" property = "sname" />
+		<result column = "phone" property = "phone" />
+		<result column = "status" property = "status" />
+		<result column = "spnum" property = "spnum" />
+		<result column = "simg" property = "simg" />
+		<result column = "sprice" property = "sprice" />
+	</resultMap >
+	<!--查询方案记录表-->
+	<select id = "findWxSchemeRecording" resultMap = "WxSchemeRecordingResponseMap" >
+		SELECT
+			sr.`srid`,
+			sr.`urid`,
+			sr.`sid`,
+			sr.`phone`,
+			sc.`sname`,
+			su.`username`,
+			sr.`date`,
+			sr.`status`,
+			sc.`spnum`,
+			sc.`simg`,
+			sc.`sprice`
+		FROM `scheme_recording` sr
+			LEFT JOIN `scheme` sc ON sr.`sid` = sc.`sid`
+			LEFT JOIN `sys_user` su ON su.`id` = sr.`urid`
+		WHERE sr.`urid` = #{urid}
+		ORDER BY sr.`status`, sr.`srid` DESC
+	</select >
+	<!--查询方案-->
+	<select id = "getWxSchemeRecording" parameterType = "WxSchemeRecording" resultType = "WxSchemeRecording" >
+		SELECT
+			sr.`sid`,
+			sr.`srid`,
+			sr.`urid`,
+			sr.`phone`,
+			sr.`status`,
+			sr.`date`
+		FROM `scheme_recording` sr
+		WHERE
+			sr.`urid` = #{urid}
+			AND
+			sr.`sid` = #{sid}
+			AND sr.`status` IN (0, 1)
+	</select >
+	
+ 
+
+
+
+
+
+</mapper >

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.GuestBookDao" >
+
+    <resultMap id = "GuestBookMap" type = "GuestBook" >
+        <result column = "gbid" property = "gbid" />
+        <result column = "urid" property = "urid" />
+        <result column = "auid" property = "auid" />
+        <result column = "gbinfo" property = "gbinfo" />
+        <result column = "gbdate" property = "gbdate" />
+    </resultMap >
+	
+	<!--用户留言-->
+	<insert id = "saveGuestBook" parameterType = "GuestBook"
+	        useGeneratedKeys = "true" keyProperty = "gbid" >
+        INSERT into
+        guestbook(urid,auid,gbinfo,gbdate)
+        VALUES(#{urid},#{auid},#{gbinfo},CURRENT_TIMESTAMP)
+    </insert >
+	
+	
+    <resultMap id = "GuestBookResponseMap" type = "GuestBookResponse" >
+        <result column = "gbid" property = "gbid" />
+        <result column = "urid" property = "urid" />
+        <result column = "auid" property = "auid" />
+        <result column = "gbinfo" property = "gbinfo" />
+        <result column = "gbdate" property = "gbdate" />
+        <result column = "username" property = "username" />
+    </resultMap >
+	<select id = "findGuestBookUser" parameterType = "String" resultMap = "GuestBookResponseMap" >
+        SELECT gb.`gbid`,gb.`urid`,gb.`auid`,gb.`gbinfo`,gb.`gbdate`
+        ,su.`username`
+		FROM `guestbook` gb
+			,guestbook bk
+			,`sys_user` su
+        <where >
+            gb.urid IS NOT NULL
+	        AND su.id =gb.`urid`
+			<if test = "status =='Pending'" >
+				AND gb.`gbid` <![CDATA[ != ]]>  bk.`auid`
+			</if >
+			<if test = " status =='Processed'" >
+				 AND gb.`gbid` = bk.`auid`
+			</if >
+		</where >
+        GROUP BY gb.`gbid`
+    </select >
+	
+	
+	<!--查询详情-->
+	<select id = "getGuestBookDetails" parameterType = "GuestBook" resultMap = "GuestBookMap" >
+        SELECT gb.`gbid`,gb.`urid`,gb.`auid`,gb.`gbinfo`,gb.`gbdate`
+        FROM `guestbook` gb
+        WHERE gb.`auid`=#{gbid}
+    </select >
+    
+    
+
+    <select id = "findGuestBookByGbid" parameterType = "java.util.List" resultMap = "GuestBookMap" >
+        SELECT gb.`gbid`,gb.`urid`,gb.`auid`,gb.`gbinfo`,gb.`gbdate`
+        FROM `guestbook` gb
+        where gb.`gbid`IN
+        <foreach collection = "list" item = "gbid" open = "(" close = ")"
+                 separator = "," >
+            #{gbid}
+        </foreach >
+        or gb.`auid`IN
+        <foreach collection = "list" item = "gbid" open = "(" close = ")"
+                 separator = "," >
+            #{gbid}
+        </foreach >
+    </select >
+	
+	<!--批量:删除用户留言-->
+	<delete id = "deleteGuestBook" parameterType = "java.util.List" >
+        DELETE FROM
+        guestbook
+        WHERE gbid IN
+        <foreach collection = "list" item = "gbid" open = "(" close = ")"
+                 separator = "," >
+            #{gbid}
+        </foreach >
+    </delete >
+
+
+</mapper >

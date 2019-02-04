@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.UserSchemeDao">
+
+	<resultMap id="UserScheme" type="UserScheme">
+		<result column="usid" property="usid" />
+		<result column="usuid" property="usuid" />
+		<result column="ussid" property="ussid" />
+		<result column="ustitle" property="ustitle" />
+		<result column="usinfo" property="usinfo" />
+		<result column="usjson" property="usjson" />
+		<result column="usdate" property="usdate" />
+	</resultMap>
+
+
+	<!--新增用户自定义方案 -->
+	<insert id="saveUserScheme" parameterType="UserScheme">
+		<selectKey resultType="int" order="AFTER" keyProperty="usid">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into user_scheme
+		(usuid,ussid,ustitle,usinfo,usjson,usdate)
+		values(#{usuid},#{ussid},#{ustitle},#{usinfo},CURRENT_TIMESTAMP)
+	</insert>
+</mapper>

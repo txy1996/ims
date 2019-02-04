@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.SchemeDao">
+	<resultMap id="StaShopMap" type="StageShop">
+		<result column="sssid" property="sssid" />
+		<result column="shopid" property="shopid" />
+		<result column="ssid" property="ssid" />
+		<result column="ssort" property="ssort" />
+		<result column="ssad" property="ssad" />
+		<result column="ssimgs" property="ssimgs" />
+		<result column="sreplace" property="sreplace" />
+		<association property="shop" javaType="Shop">
+			<result column="sid" property="sid" />
+			<result column="zid" property="zid" />
+			<result column="bid" property="bid" />
+			<result column="scid" property="scid" />
+			<result column="sname" property="sname" />
+			<result column="saddress" property="saddress" />
+			<result column="stel" property="stel" />
+			<result column="scoordinate" property="scoordinate" />
+			<result column="scommerce" property="scommerce" />
+			<result column="sstate" property="sstate" />
+			<result column="syear" property="syear" />
+			<result column="sstyle" property="sstyle" />
+			<result column="slevel" property="slevel" />
+			<result column="scompartmentnum" property="scompartmentnum" />
+			<result column="stcompartment" property="stcompartment" />
+			<result column="scompartmentinfo" property="scompartmentinfo" />
+			<result column="scompartmentmin" property="scompartmentmin" />
+			<result column="smax" property="smax" />
+			<result column="smeetingplace" property="smeetingplace" />
+			<result column="sad" property="sad" />
+			<result column="sinfo" property="sinfo" />
+			<result column="ssmeetingplacemin"
+				property="ssmeetingplacemin" />
+			<result column="ssort" property="ssort" />
+			<result column="sbalancetype" property="sbalancetype" />
+			<result column="sbwx" property="sbwx" />
+			<result column="sbzfb" property="sbzfb" />
+			<result column="sbyhk" property="sbyhk" />
+		</association>
+		<association property="stage" javaType="Stage">
+			<result column="ssid" property="ssid" />
+			<result column="sid" property="sid" />
+			<result column="ssname" property="ssname" />
+			<result column="ssinfo" property="ssinfo" />
+		</association>
+	</resultMap>
+	<select id="getStShop" resultMap="StaShopMap">
+		select a1.sssid ,a1.shopid,a1.ssid,a1.ssad,a1.ssimgs,a2.sname,a3.ssname,a3.ssinfo from
+		s_s_shop a1, shop a2,scheme_stage a3
+		where a1.shopid = a2.sid and a1.ssid = a3.ssid
+	</select>
+	<select id="getOneShop" parameterType="Integer" resultMap="StaShopMap">
+		select a1.sssid ,a1.shopid,a1.ssid,a1.ssad,a1.ssimgs,a2.sname,a3.ssname,a3.ssinfo from
+		s_s_shop a1, shop a2,scheme_stage a3
+		where a1.shopid = a2.sid and a1.ssid = a3.ssid
+		and a1.sssid =#{sssid}
+	</select>
+	<delete id="deleteStaShop" parameterType="Integer">
+		delete from s_s_shop where sssid = #{sssid}
+	</delete>
+	<update id="updateStaShop" parameterType="StageShop">
+		update s_s_shop set
+		shopid = #{shopid},
+		ssid = #{ssid},
+		ssid = #{ssid},
+		ssort = #{ssort},
+		ssad =#{ssad},
+		ssimgs = #{ssimgs},
+		sreplace= #{sreplace}
+		where sssid = #{sssid}
+	</update>
+	<insert id="addStaShop" parameterType="StageShop"
+		useGeneratedKeys="true" keyProperty="sssid">
+		insert into s_s_shop (shopid,ssid,ssort,ssad,ssimgs,sreplace)values(#{shopid},#{ssid},#{ssort},#{ssad},#{ssimgs},#{sreplace})		
+	</insert>
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.PromotionDao" >
+	<resultMap id = "SetResultMap" type = "Promotion" >
+		<result column = "id" property = "id" />
+		<result column = "ptype" property = "ptype" />
+		<result column = "pzone" property = "pzone" />
+		<result column = "psource" property = "psource" />
+		<result column = "pinfo" property = "pinfo" />
+		<result column = "sdate" property = "sdate" />
+		<result column = "odate" property = "odate" />
+		<result column = "state" property = "state" />
+		<result column = "pdate" property = "pdate" />
+	</resultMap >
+	
+	<insert id = "add" parameterType = "Promotion" useGeneratedKeys = "true"
+	        keyProperty = "Id" >
+		insert into promotion(ptype,pzone,psource,pinfo,sdate,odate,state,pdate)
+		values(#{ptype},#{pzone},#{psource},#{pinfo},#{sdate},#{odate},#{state},#{pdate})
+		</insert >
+	<select id = "select" resultMap = "SetResultMap" >
+	select p.id,p.ptype,p.pzone,p.sdate,p.odate,p.state from promotion p
+	</select >
+	
+	 <select id = "polling" resultMap = "SetResultMap" >
+	select id,ptype,pzone,sdate,odate,state from promotion  where 1=1 
+	 <if test = "stadate != null and stadate !='' " >
+	and sdate &lt;= #{stadate}
+	 </if >
+	 <if test = "enddate != null and enddate !='' " >
+	and odate &gt;= #{enddate}
+	 </if >
+	    <if test = "ptype != null" >
+	and ptype= #{ptype}
+	 </if >
+	    <if test = "bt != null" >
+	and pzone like '%${bt}%' 
+	 </if >
+			 
+			 
+	</select >
+	<select id = "getPromotion" parameterType = "Integer" resultMap = "SetResultMap" >
+	select ptype,state from promotion where id = #{id}
+	</select >
+	
+	<update id = "delete" parameterType = "Promotion" >
+		update promotion
+		<set >
+			<if test = "psource != null" >psource=#{psource},</if >
+		</set >
+		where id = #{id}
+	</update >
+	
+	<update id = "update" parameterType = "Promotion" >
+		update promotion 
+		 <set >
+			<if test = "state != null" >state=#{state},</if >
+		</set >
+		where id = #{id}
+	</update >
+	
+	<select id = "edit" parameterType = "Integer" resultMap = "SetResultMap" >
+	select id,ptype,pzone,psource,pinfo,sdate,odate,state from promotion where id = #{id}
+	</select >
+	
+	<update id = "updatepro" parameterType = "Promotion" >
+		update promotion
+		<set >
+			<if test = "ptype != null" >ptype=#{ptype},</if >
+			<if test = "pzone != null" >pzone=#{pzone},</if >
+			<if test = "psource != null" >psource=#{psource},</if >
+			<if test = "pinfo != null" >pinfo=#{pinfo},</if >
+			<if test = "sdate != null" >sdate=#{sdate},</if >
+			<if test = "odate != null" >odate=#{odate},</if >
+			<if test = "state != null" >state=#{state},</if >
+		</set >
+		where id = #{id}
+	</update >
+
+	
+	<select id = "findShopRecommend" parameterType = "Integer" resultType = "Promotion" >
+		SELECT * FROM promotion WHERE ptype=#{ptype}
+	</select >
+	
+	<select id = "edit1" parameterType = "Integer" resultType = "Promotion" >
+	select id,ptype,pzone,psource,pinfo,sdate,odate,state from promotion where id = #{id}
+	</select >
+
+	
+	<select id = "Recommend" parameterType = "Integer" resultMap = "SetResultMap" >
+	select ptype,psource from promotion where id = #{id}
+	</select >
+	
+	<update id = "upRecommend" parameterType = "Promotion" >
+		update promotion 
+		 <set >
+			<if test = "psource != null" >psource=#{psource},</if >
+		</set >
+		where id = #{id}
+	</update >
+	
+	<select id = "inquire" parameterType = "Integer" resultMap = "SetResultMap" >
+	select max(id) id from promotion where ptype = #{id}
+
+	</select >
+	
+	
+	<select id = "findPromotionByPtype" parameterType = "Integer" resultMap = "SetResultMap" >
+	SELECT pn.`id`,pn.`ptype`,pn.`pzone`,pn.`sdate`,pn.`odate`,pn.`state`
+	FROM `promotion` pn
+	WHERE pn.`ptype`=#{ptype}
+	AND
+	NOW() &gt; pn.`sdate`
+	AND
+	NOW() &lt; pn.`odate`
+	</select >
+	
+	<select id="findpromlist" resultType="Promotion" parameterType="String">
+		SELECT * FROM promotion WHERE psource LIKE '%${psource}%' AND psource NOT LIKE '%#%'
+	</select>
+</mapper>

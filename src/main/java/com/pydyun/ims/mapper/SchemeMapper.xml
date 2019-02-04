@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.SchemeDao" >
+	<resultMap id = "BaseResultMap" type = "Scheme" >
+		<id column = "sid" property = "sid" />
+		<result column = "scid" property = "scid" />
+		<result column = "urid" property = "urid" />
+		<result column = "sname" property = "sname" />
+		<result column = "sinfo" property = "sinfo" />
+		<result column = "spraise" property = "spraise" />
+		<result column = "soppose" property = "soppose" />
+		<result column = "sstate" property = "sstate" />
+		<result column = "sdate" property = "sdate" />
+		<association property = "scheme_class"
+		             javaType = "Scheme_class" >
+			<id column = "scid" property = "scid" />
+			<result property = "scscid" column = "scscid" />
+			<result property = "scname" column = "scname" />
+			<result property = "scinfo" column = "scinfo" />
+		</association >
+	</resultMap >
+	<resultMap id = "SchemIoResultMap" type = "SchemeIo" >
+		<id column = "sid" property = "sid" />
+		<result column = "scid" property = "scid" />
+		<result column = "urid" property = "urid" />
+		<result column = "sname" property = "sname" />
+		<result column = "sinfo" property = "sinfo" />
+		<result column = "spraise" property = "spraise" />
+		<result column = "soppose" property = "soppose" />
+		<result column = "sstate" property = "sstate" />
+		<result column = "sdate" property = "sdate" />
+		<association property = "scheme_class"
+		             javaType = "Scheme_class" >
+			<id column = "scid" property = "scid" />
+			<result property = "scscid" column = "scscid" />
+			<result property = "scname" column = "scname" />
+			<result property = "scinfo" column = "scinfo" />
+		</association >
+		<association property = "sys_user" javaType = "Sys_User" >
+			<id column = "id" property = "id" />
+			<result column = "username" property = "username" />
+			<result column = "password" property = "password" />
+			<result column = "salt" property = "salt" />
+			<result column = "create_time" property = "create_time" />
+			<result column = "state" property = "state" />
+			<result column = "real_name" property = "real_name" />
+			<result column = "gender" property = "gender" />
+			<result column = "nation" property = "nation" />
+			<result column = "birth" property = "birth" />
+			<result column = "urautograph" property = "urautograph" />
+			<result column = "mobile" property = "mobile" />
+			<result column = "email" property = "email" />
+			<result column = "department" property = "department" />
+			<result column = "position" property = "position" />
+			<result column = "note" property = "note" />
+			<result column = "head" property = "head" />
+			<result column = "activate_time" property = "activate_time" />
+			<result column = "code" property = "code" />
+			<result column = "maileCode" property = "maileCode" />
+			<result column = "wx_OpenId" property = "wx_OpenId" />
+			<result column = "qq_openid" property = "qq_openid" />
+			<result column = "zfb_openid" property = "zfb_openid" />
+			<result column = "referee" property = "referee" />
+
+		</association >
+		<collection property = "sctage" ofType = "Scheme_stage" >
+			<id property = "ssid" column = "ssid" />
+			<result property = "sid" column = "sid" />
+			<result property = "ssname" column = "ssname" />
+			<result property = "ssinfo" column = "ssinfo" />
+		</collection >
+	</resultMap >
+    <delete id="deletesec" parameterType="Integer">
+    delete from scheme where sid = #{id}
+    </delete>
+	<select id = "selectBySid" parameterType = "Integer"
+	        resultMap = "SchemIoResultMap" >
+		select
+		a1.sid,a1.scid,a1.sname,a1.sinfo,a1.spraise,a1.soppose,a1.sstate,a1.sdate,a2.scname,a2.scinfo,a3.ssname,a3.ssinfo,a4.username
+		from scheme a1,scheme_class a2,scheme_stage a3,sys_user a4
+		where a1.sid
+		= a3.sid
+		and a1.scid = a2.scid
+		and a1.urid = a4.id
+		and a1.sid =#{sid}
+	</select >
+	<!-- choise为规模(对应方案适合人数)timechoise为时长(对应方案时间长度)naturechoise为性质(对应场地位置是公司内，还是外部寻找) -->
+	<select id="getSchemec" resultMap="BaseResultMap">
+	select sname,sinfo,spraise,soppose,sstate,sdate from scheme where scid = #{scid}
+	<if test="choise !=null">
+	and spnum = #{choise}
+	</if>
+	<if test="timechoise != null">
+	and sduration = #{timechoise}
+	</if>
+	<if test="naturechoise !=null">
+	and srange = #{naturechoise}
+	</if>
+	</select>
+	<select id = "getMessage" resultMap = "BaseResultMap" >
+		select
+		a1.sid,a1.sname,a1.sinfo,a1.spraise,a1.soppose,a1.sstate,a1.sdate,a2.scname,a3.username
+		from
+		scheme a1,
+		scheme_class a2,
+		sys_user a3
+		<where >
+		a1.scid = a2.scid
+		and
+		a1.urid = a3.id
+			<if test = "urid != null" >
+			and a1.urid=#{urid}
+		</if >
+		<if test = "sstate != null" >
+			and a1.sstate=#{sstate}
+		</if >
+		<if test = "spnum != null" >
+			and a1.spnum=#{spnum}
+		</if >
+		<if test = "sduration != null" >
+			and a1.sduration=#{sduration}
+		</if >
+		<if test = "srange != null" >
+			and a1.srange=#{srange}
+		</if >
+		<if test = "sprice != null" >
+			and a1.sprice=#{sprice}
+		</if >
+		<if test = "sname != null" >
+			and a1.sname=#{sname}
+		</if >
+		</where >
+	</select >
+	
+	
+	<select id = "getOneMessage" parameterType = "Integer"
+	        resultType = "Scheme" >
+		select
+  a1.sid,
+  a1.sname,
+  a1.sinfo,
+  a1.spraise,
+  a1.soppose,
+  a1.sstate,
+  a1.sdate,
+  a1.`spnum`,
+  a1.`sduration`,
+  a1.`srange`,
+  a1.`sprice`,
+  a1.`simg`,
+  a2.scid,
+  a2.scname,
+  a3.username
+from
+  scheme a1,
+  scheme_class a2,
+  sys_user a3
+where a1.scid = a2.scid
+  and a1.urid = a3.id
+  and a1.sid = #{sid}
+	</select >
+	
+	<update id = "updateScheme" parameterType = "Scheme" >
+		UPDATE scheme
+		<set >
+			<if test = "scid != null" >scid=#{scid},</if >
+			<if test = "sname != null" >sname=#{sname},</if >
+			<if test = "sinfo != null" >sinfo=#{sinfo},</if >
+			<if test = "spraise != null" >spraise=#{spraise},</if >
+			<if test = "soppose != null" >soppose=#{soppose},</if >
+			<if test = "sstate != null" >sstate=#{sstate},</if >
+			<if test = "spnum != null" >spnum=#{spnum},</if >
+			<if test = "sduration != null" >sduration=#{sduration},</if >
+			<if test = "srange != null" >srange=#{srange},</if >
+			<if test = "sprice != null" >sprice=#{sprice},</if >
+			<if test = "simg != null" >simg=#{simg},</if >
+		</set >
+		WHERE sid =#{sid}
+	</update >
+	<delete id = "deleteScheme" parameterType = "Integer" >
+		delete from scheme where
+		sid = #{sid}
+	</delete >
+	<insert id = "addScheme" parameterType = "Scheme"
+	        useGeneratedKeys = "true" keyProperty = "sid" >
+		insert into scheme
+		(scid,urid,sname,sinfo,sstate,sdate,spnum,sduration,srange,sprice,Simg)
+		values
+		(#{scid},#{urid},#{sname},#{sinfo},#{sstate},CURRENT_TIMESTAMP,#{spnum},#{sduration}
+		,#{srange},#{sprice},#{simg})
+	</insert >
+	<select id = "getMessageByid" parameterType = "Integer"
+	        resultType = "SchemeIo" >
+		select
+		a1.sid,a1.sname,a1.sinfo,a1.spraise,a1.soppose,a1.sstate,a1.sdate,a2.scname,a2.scinfo,a3.ssname,a3.ssinfo,a4.username
+		from scheme a1,scheme_class a2,scheme_stage a3,sys_user a4
+		where a1.sid
+		= a3.sid
+		and a1.scid = a2.scid
+		and a1.urid = a4.id
+		and a1.sid =#{sid}
+	</select >
+
+	<select id = "getSname" parameterType = "String" resultType = "Scheme" >
+		select
+		sid ,sname from scheme
+	</select >
+
+	<resultMap type = "SchemeResponse"
+	           id = "SchemeResponseBaseResultMap" >
+		<id column = "sid" property = "sid" />
+		<result column = "scname" property = "scname" />
+		<result column = "sname" property = "sname" />
+		<result column = "sinfo" property = "sinfo" />
+		<result column = "spraise" property = "spraise" />
+		<result column = "soppose" property = "soppose" />
+		<result column = "sstate" property = "sstate" />
+		<result column = "sdate" property = "sdate" />
+		<result column = "username" property = "username" />
+		<result column = "lsnum" property = "lsnum" />
+		<result column = "labels" property = "labels" />
+		<result column = "spnum" property = "spnum" />
+		<result column = "sduration" property = "sduration" />
+		<result column = "srange" property = "srange" />
+		<result column = "sprice" property = "sprice" />
+		<result column = "simg" property = "simg" />
+		<result column = "scid" property = "scid" />
+	</resultMap >
+	<select id="pscheme" resultMap="SchemeResponseBaseResultMap">
+	select sid,sname,simg from scheme where sid in (${_parameter})
+	</select>
+	<!--查询方案详情 -->
+	<select id = "foundSchemeById" parameterType = "Integer"
+	        resultMap = "SchemeResponseBaseResultMap" >
+		SELECT sc.`sid`, sc.`sname`,sc.`spnum`,sc.`sduration`,sc.`srange`,sc.`sprice`,sc.`simg`,
+		scl.`scid`,scl.`scname`,sc.`sstate`,sc.`sdate`,su.`username`,
+		sc.`spraise`,sc.`soppose`,sc.`sinfo`,lss.`lsnum`, lss.labels
+		FROM
+		scheme sc
+		LEFT JOIN `sys_user` su ON sc.`urid`=su.`id`
+		LEFT JOIN
+		`scheme_class` scl ON sc.`scid`=scl.`scid`
+		LEFT JOIN (SELECT
+		lss.`sid`AS sid ,
+		GROUP_CONCAT(CONCAT(lss.`lid`)) AS lid,
+		GROUP_CONCAT(CONCAT(lss.`lsnum`)) AS lsnum,
+		GROUP_CONCAT(CONCAT(la.`lcinfo`)) AS labels
+		FROM
+		`label_scheme_sum` lss
+		LEFT JOIN `label` la ON FIND_IN_SET(la.lid,lss.lid)
+		AND lss.`lstype`=0
+		GROUP BY
+		lss.`sid`)
+		lss
+		ON
+		lss.`sid`=sc.sid
+		WHERE
+		sc.`sid`=#{sid}
+	</select >
+	
+	<!--根据id获取方案名称,介绍,为用户自定义方案提供信息 -->
+	<select id = "getSchemeByid" parameterType = "Integer"
+	        resultType = "Scheme" >
+		SELECT sc.`sname`,sc.`sinfo`
+		FROM `scheme` sc
+		WHERE
+		sc.`sid`=#{sid}
+	</select >
+
+
+
+
+
+</mapper >

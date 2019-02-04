@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.CompanyDAO">
+	<resultMap id="CompanyMap" type="Company">
+		<id column="cid" property="cid" />
+		<result column="zid" property="zid" />
+		<result column="cname" property="cname" />
+		<result column="cgeneral_taxpayer" property="cgeneral_taxpayer" />
+		<result column="cidentify" property="cidentify" />
+		<result column="ccode" property="ccode" />
+		<result column="caddress" property="caddress" />
+		<result column="cbank" property="cbank" />
+		<result column="caccount" property="caccount" />
+		<result column="ctel" property="ctel" />
+		<result column="cinfo" property="cinfo" />
+		<association property="zone" javaType="Zone">
+			<id property="zid" column="zid" />
+			<result property="zname" column="zname" />
+			<result property="z_zid" column="z_zid" />
+		</association>
+
+	</resultMap>
+	<select id="queryAll" parameterType="map" resultMap="CompanyMap">
+		select
+		c1.cid,c1.cname,c1.cgeneral_taxpayer,c1.cidentify,c1.ccode,c1.caddress,c1.cbank,c1.caccount,c1.ctel,c1.cinfo
+		,c2.zname from company c1
+		inner JOIN zone c2 ON c1.zid = c2.zid
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+			<if test="cidentify !=null">
+				and c1.cidentify LIKE '%${cidentify}%'
+			</if>
+			<if test="ccode!=null">
+				and c1.ccode LIKE '%${ccode}%'
+			</if>
+			<if test="caccount!=null">
+				and c1.caccount LIKE '%${caccount}%'
+			</if>
+		</trim>
+	</select>
+	
+	<insert id="addCompany" parameterType="Company" useGeneratedKeys="true"
+	keyProperty="cid">
+	insert into company(zid,cname,cgeneral_taxpayer,cidentify,ccode,caddress,cbank,caccount,ctel,cinfo)
+		values(#{zid},#{cname},#{cgeneral_taxpayer},#{cidentify},#{ccode},#{caddress},#{cbank},#{caccount},#{ctel},#{cinfo})
+	</insert>
+	
+	
+	<select id="findById" parameterType="Integer"
+		resultMap="CompanyMap">
+		select 
+		c1.cid as cid,
+		c1.zid as zid,
+		c1.cname as cname,
+		c1.cgeneral_taxpayer as cgeneral_taxpayer,
+		c1.cidentify as cidentify,
+		c1.ccode as ccode,
+		c1.caddress as caddress,
+		c1.cbank as cbank,
+		c1.caccount as caccount,
+		c1.ctel as ctel,
+		c1.cinfo as cinfo,
+		c2.zname as zname 
+		from
+		company c1
+		inner JOIN zone c2 ON c1.zid = c2.zid
+		where c1.cid = #{cid}
+
+	</select>
+	<delete id="deleteCompany" parameterType="Integer">
+		delete from company
+		where cid = #{cid}
+	</delete>
+
+	<update id="updateCompany" parameterType="Company">
+		update company
+		set
+		zid = #{zid},
+		cname=#{cname},
+		cgeneral_taxpayer=#{cgeneral_taxpayer},
+		cidentify = #{cidentify},
+		ccode= #{ccode},
+		caddress =#{caddress},
+		cbank =#{cbank},
+		caccount=#{caccount},
+		ctel = #{ctel},
+		cinfo = #{cinfo}
+		where cid = #{cid}
+	</update>
+	<select id="selectAllZName" resultMap="CompanyMap">
+		SELECT z.zid,z.zname FROM company c inner JOIN zone z ON c.zid = z.zid
+WHERE z.zid is not NULL
+	</select>
+	
+	<select id="getName" parameterType="String" resultType="Company">
+		select cid,cname from company
+	</select>
+</mapper>

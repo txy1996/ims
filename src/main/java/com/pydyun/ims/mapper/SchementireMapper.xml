@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.SchementireDao">
+	<!-- 方案信息 -->
+	<resultMap id="planResultMap" type="plan">
+		<id column="sid" property="sid" />
+		<result column="scid" property="scid" />
+		<result column="urid" property="urid" />
+		<result column="sname" property="sname" />
+		<result column="sinfo" property="sinfo" />
+		<result column="spraise" property="spraise" />
+		<result column="soppose" property="soppose" />
+		<result column="sstate" property="sstate" />
+		<result column="sdate" property="sdate" />
+		<collection property="phash" ofType="Phase">
+			<id column="ssid" property="ssid" />
+			<result column="sid" property="sid" />
+			<result column="ssname" property="ssname" />
+			<result column="ssinfo" property="ssinfo" />
+			<collection property="listings" ofType="Listings">
+				<id column="sssid" property="sssid" />
+				<result column="shopid" property="shopid" />
+				<result column="ssid" property="ssid" />
+				<result column="ssort" property="ssort" />
+				<result column="ssad" property="ssad" />
+				<result column="ssimgs" property="ssimgs" />
+				<result column="sreplace" property="sreplace" />
+				<association property="shop" javaType="Shop">
+					<id column="sid" property="sid" />
+					<result column="zid" property="zid" />
+					<result column="bid" property="bid" />
+					<result column="scid" property="scid" />
+					<result column="sname" property="sname" />
+					<result column="saddress" property="saddress" />
+					<result column="stel" property="stel" />
+					<result column="scoordinate" property="scoordinate" />
+					<result column="scommerce" property="scommerce" />
+					<result column="sstate" property="sstate" />
+					<result column="syear" property="syear" />
+					<result column="sstyle" property="sstyle" />
+					<result column="slevel" property="slevel" />
+					<result column="scompartmentnum" property="scompartmentnum" />
+					<result column="stcompartment" property="stcompartment" />
+					<result column="scompartmentinfo" property="scompartmentinfo" />
+					<result column="scompartmentmin" property="scompartmentmin" />
+					<result column="smax" property="smax" />
+					<result column="smeetingplace" property="smeetingplace" />
+					<result column="sad" property="sad" />
+					<result column="sinfo" property="sinfo" />
+					<result column="ssmeetingplacemin" property="ssmeetingplacemin" />
+					<result column="ssort" property="ssort" />
+					<result column="sbalancetype" property="sbalancetype" />
+					<result column="sbwx" property="sbwx" />
+					<result column="sbzfb" property="sbzfb" />
+					<result column="sbyhk" property="sbyhk" />
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="findPlanMessage" resultMap="planResultMap">
+	select a1.*,a2.ssname,a3.ssimgs,a3.ssad,a4.sname,a5.scname from scheme
+	a1,scheme_stage a2, s_s_shop a3,shop a4,scheme_class a5
+	where a1.sid = a2.sid and a1.scid= a5.scid and a2.ssid = a3.ssid and
+	a3.shopid = a4.sid 
+	</select>
+</mapper>

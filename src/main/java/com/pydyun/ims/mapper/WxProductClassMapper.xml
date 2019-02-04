@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxProductClassDao">
+	<resultMap id="SetResultMap" type="WxProductClass">
+		<id column="id" property="id" />
+		<result column="cid" property="cid" />
+		<result column="cname" property="cname" />
+		<result column="templet_list" property="templet_list" />
+		<result column="templet_product" property="templet_product" />
+		<association property="wxproduct" javaType="WxProduct">
+			<id column="cid" property="cid" />
+			<result column="pname" property="pname" />
+			<result column="id" property="id" />
+			<result column="sid" property="sid" />
+			<result column="spunum" property="spunum" />
+			<result column="stock" property="stock" />
+			<result column="pcode" property="pcode" />
+			<result column="property" property="property" />
+			<result column="price" property="price" />
+			<result column="yprice" property="yprice" />
+			<result column="info" property="info" />
+			<result column="state" property="state" />
+		</association>
+		<association property="wxshop" javaType="WxShop">
+			<id column="sid" property="sid" />
+			<result column="scid" property="scid" />
+			<result column="zid" property="zid" />
+			<result column="bid" property="bid" />
+			<result column="sname" property="sname" />
+			<result column="saddress" property="saddress" />
+			<result column="stel" property="stel" />
+			<result column="scoordinate" property="scoordinate" />
+			<result column="scommerce" property="scommerce" />
+			<result column="sstate" property="sstate" />
+			<result column="sad" property="sad" />
+			<result column="sinfo" property="sinfo" />
+			<result column="ssort" property="ssort" />
+			<result column="sbalancetype" property="sbalancetype" />
+			<result column="sbwx" property="sbwx" />
+			<result column="sbzfb" property="sbzfb" />
+			<result column="sbyhk" property="sbyhk" />
+			<result column="slogo" property="slogo" />
+			<result column="styleimg" property="styleimg" />
+		</association>
+		<association property="wximg" javaType="WxProductimg">
+			<result column="id" property="id" />
+			<result column="pid" property="pid" />
+			<result column="url" property="url" />
+			<result column="tfimg" property="tfimg" />
+			<result column="name" property="name" />
+			<result column="updata" property="updata" />
+		</association>
+		<!-- <association property="wxproductclass" javaType="WxProductClass">
+			<result column="id" property="id" />
+			<result column="cid" property="cid" />
+			<result column="cname" property="cname" />
+		</association> -->
+	</resultMap>
+	<select id="restaurant" parameterType="Integer"
+		resultMap="SetResultMap">
+		select s.sid, s.sname,s.saddress,s.stel,pr.pname,pro.url
+		from shop s
+		,productimg pro,
+		(select id from productclass where
+		cid=#{id}) p,product pr where p.id =
+		pr.cid and pro.pid=pr.id and
+		pr.sid = s.sid limit 0,3
+	</select>
+	<select id="listsang" parameterType="Integer"
+		resultMap="SetResultMap">
+		select s.sid, s.sname,s.saddress,s.stel,pr.pname,pro.url
+		from shop s ,productimg pro,
+		(select id from productclass where
+		cid=#{id1}) p,product pr where p.id =
+		pr.cid and pro.pid=pr.id and
+		pr.sid = s.sid limit 0,3
+	</select>
+	<select id="listtravel" parameterType="Integer"
+		resultMap="SetResultMap">
+		select s.sid, s.sname,s.saddress,s.stel,pr.pname,pro.url
+		from shop s ,productimg pro,
+		(select id from productclass where
+		cid=#{id2}) p,product pr where p.id =
+		pr.cid and pro.pid=pr.id and
+		pr.sid = s.sid limit 0,3
+	</select>	
+
+	<resultMap id="SuperiorProudctClass" type="ProductClass">
+		<result column="id" property="id" />
+		<result column="cname" property="text" />
+		<result column="cid" property="cid" />
+
+	</resultMap>
+	<select id="findSuperiorProudctClass"
+		resultMap="SuperiorProudctClass">
+		SELECT
+		ps.`id`,ps.`cname`,ps.`cid`
+		FROM `productclass` ps
+		WHERE ps.cid IS NULL
+	</select>
+	<select id="findProudctClassByCid"
+		resultMap="SuperiorProudctClass">
+		SELECT ps.`id`,ps.`cname`,ps.`cid`
+		FROM `productclass` ps
+		WHERE ps.cid =#{id}
+	</select>
+	
+	<select id="findaddress" resultMap="SetResultMap">
+		SELECT id,templet_list,templet_product FROM productclass WHERE 1=1
+		<if test="cname !=null">
+			and cname=#{cname} AND templet_list IS NOT NULL
+		</if>
+		<if test="id !=null">
+			and id=#{id}
+		</if>
+	</select>
+	
+	<select id="selectclass" resultType="WxProductClass" parameterType="Integer">
+		SELECT pro1.cname as ccname,pro2.cname  FROM productclass pro1 INNER JOIN productclass pro2 
+		ON pro1.id=pro2.cid AND pro2.id=#{id}
+	</select>
+		
+</mapper>

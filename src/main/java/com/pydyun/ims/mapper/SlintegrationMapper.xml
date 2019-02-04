@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.SlintegrationDao">
+	<resultMap id="SetResultMap" type="Slintegration">
+		<id column="sid" property="sid" />
+		<result column="slid" property="slid" />
+		<result column="sgetinfo" property="sgetinfo" />
+		<result column="sgetnum" property="sgetnum" />
+		<result column="sgetdate" property="sgetdate" />
+		<result column="ssum" property="ssum" />
+		<association property="shop" javaType="Shop">
+			<id column="sid" property="sid" />
+			<result column="zid" property="zid" />
+			<result column="bid" property="bid" />
+			<result column="scid" property="scid" />
+			<result column="sname" property="sname" />
+			<result column="saddress" property="saddress" />
+			<result column="stel" property="stel" />
+			<result column="scoordinate" property="scoordinate" />
+			<result column="scommerce" property="scommerce" />
+			<result column="sstate" property="sstate" />
+			<result column="syear" property="syear" />
+			<result column="sstyle" property="sstyle" />
+			<result column="slevel" property="slevel" />
+			<result column="scompartmentnum" property="scompartmentnum" />
+			<result column="stcompartment" property="stcompartment" />
+			<result column="scompartmentinfo" property="scompartmentinfo" />
+			<result column="scompartmentmin" property="scompartmentmin" />
+			<result column="smax" property="smax" />
+			<result column="smeetingplace" property="smeetingplace" />
+			<result column="sad" property="sad" />
+			<result column="sinfo" property="sinfo" />
+			<result column="ssmeetingplacemin"
+				property="ssmeetingplacemin" />
+			<result column="ssort" property="ssort" />
+			<result column="sbalancetype" property="sbalancetype" />
+			<result column="sbwx" property="sbwx" />
+			<result column="sbzfb" property="sbzfb" />
+			<result column="sbyhk" property="sbyhk" />
+		</association>
+
+	</resultMap>
+	<select id="selectSlintegration" resultMap="SetResultMap">
+		select
+		s1.slid,s1.sgetinfo,s1.sgetnum,s1.sgetdate,s1.ssum,s2.sname
+		from slintegration s1,shop s2
+		where s1.sid = s2.sid
+		<if test="goinfo !=null">
+			and s1.sgetinfo=#{goinfo}
+		</if>
+		<if test="sid !=null">
+			and s2.sid =#{sid}
+		</if>
+		<if test="starttime !=null and endtime !=null">
+			and s1.sgetdate BETWEEN concat(#{starttime}) AND
+			concat(#{endtime})
+		</if>
+		order by s1.sgetdate desc
+	</select>
+
+
+	<!-- 查询指定店铺当前的积分 -->
+	<select id="seleteNum" resultType="int" parameterType="int">
+		SELECT
+		ssum
+		FROM slintegration
+		WHERE sid=#{sid}
+		ORDER BY sgetdate DESC LIMIT 1
+	</select>
+	<!--数据库函数方式  -->
+	<select id="seleteNumA" resultType="int" parameterType="int">
+		SELECT
+		GetShopIntegrationsNumByID(#{sid},0)
+	</select>
+	<!-- 为指定的店铺增加或者减少金币，并形成一条记录 -->
+	<insert id="addSlintegration" parameterType="Slintegration"
+		useGeneratedKeys="true" keyProperty="gid">
+		INSERT INTO slintegration(sid,sgetdate,sgetinfo,sgetnum,ssum)
+		VALUES(#{sid},CURRENT_TIMESTAMP,#{sgetinfo},#{sgetnum},#{ssum})
+	</insert>
+	<!--数据库函数方式  -->
+	<insert id="addshop" parameterType="Slintegration"
+		useGeneratedKeys="true" keyProperty="gid">
+		INSERT INTO slintegration(sid,sgetdate,sgetinfo,sgetnum,ssum)
+		VALUES(#{sid},CURRENT_TIMESTAMP,#{sgetinfo},#{sgetnum},GetShopIntegrationsNumByID(#{sid},#{sgetnum}))
+	</insert>
+
+	<delete id="delete" parameterType="int">
+		delete from slintegration where slid = #{slid}
+	</delete>
+</mapper>

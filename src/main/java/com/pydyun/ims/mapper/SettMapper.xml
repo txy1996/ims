@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.SettDAO">
+
+	<!-- 添加用户 -->
+	<insert id="addSettMsg" useGeneratedKeys="true" keyProperty="id"
+		parameterType="Settings">
+		insert into settings (systitle,sysstate ,sysinfo,sysreadme,sysconnection,sysxcx ,
+		wxappid,wxappsecret,zfbappid,zfbappsecret,dxlogin,dxpwd,dxurl ) 
+		values
+		(#{systitle},#{sysstate},#{sysinfo},#{sysreadme},#{sysconnection},#{sysxcx},
+		#{wxappid},#{wxappsecret},#{zfbappid},#{zfbappsecret},#{dxlogin},#{dxpwd},#{dxurl})
+	</insert>
+	<!-- 删除用户 -->
+	<delete id="deleteSett" parameterType="Integer">
+		delete from settings where id = #{id}
+	</delete>
+	<resultMap id="SetResultMap" type="Settings" >
+    <id column="id" property="id" />
+    <result column="systitle" property="systitle"  />
+    <result column="sysstate" property="sysstate"  />
+    <result column="sysinfo" property="sysinfo"  />
+    <result column="sysreadme" property="sysreadme"  />
+    <result column="sysconnection" property="sysconnection"  />
+    <result column="sysxcx" property="sysxcx"  />
+    <result column="wxappid" property="wxappid"  />
+    <result column="wxappsecret" property="wxappsecret"  />
+    <result column="zfbappid" property="zfbappid"  />
+    <result column="zfbappsecret" property="zfbappsecret"  />
+    <result column="dxlogin" property="dxlogin"  />
+    <result column="dxpwd" property="dxpwd"  />
+    <result column="dxurl" property="dxurl"  />
+       
+  </resultMap>
+	<select id="findAllSett"  resultMap="SetResultMap">
+		 select id,systitle,sysstate,sysinfo,sysreadme,sysconnection,sysxcx,wxappid,wxappsecret,zfbappid,
+   zfbappsecret,dxlogin,dxpwd,dxurl from settings
+   <if test="systitle != null">
+   where 1=1
+   and systitle LIKE '%${systitle}%'
+	</if>
+	</select>
+	
+	<update id="updateSettings" parameterType="Settings">
+		update settings set
+		systitle = #{systitle},
+		sysstate = #{sysstate},
+		sysinfo = #{sysinfo},
+		sysreadme = #{sysreadme},
+		sysconnection = #{sysconnection},
+		sysxcx = #{sysxcx},
+		wxappid = #{wxappid},
+		wxappsecret = #{wxappsecret},
+		zfbappid = #{zfbappid},
+		zfbappsecret = #{zfbappsecret},
+		dxlogin = #{dxlogin},
+		dxpwd = #{dxpwd},
+		dxurl = #{dxurl}
+	where id =#{id}
+	</update>
+	<select id="findMsg" parameterType="Integer" >
+	 select systitle,sysstate,sysinfo,sysreadme,sysconnection,sysxcx,wxappid,wxappsecret,zfbappid,
+   zfbappsecret,dxlogin,dxpwd,dxurl from settings where id = #{id} 
+	</select>
+	 <select id="getSettByTitle" parameterType="string" resultMap="SetResultMap">
+    SELECT * FROM settings
+    WHERE systitle = #{systitle}
+  </select>
+  <select id="findById" parameterType="Integer" resultMap="SetResultMap">
+    SELECT * FROM settings
+    WHERE id = #{id}
+  </select>
+</mapper>

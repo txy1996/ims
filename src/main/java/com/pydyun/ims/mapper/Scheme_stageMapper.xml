@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.Scheme_stageDao" >
+	<resultMap type = "Scheme_stage" id = "BaseResultMap" >
+		<id column = "ssid" property = "ssid" />
+		<result column = "sid" property = "sid" />
+		<result column = "scname" property = "scname" />
+		<result column = "scinfo" property = "scinfo" />
+		<association property = "scheme" javaType = "Scheme" >
+			<id column = "sid" property = "sid" />
+			<result column = "scid" property = "scid" />
+			<result column = "urid" property = "urid" />
+			<result column = "sname" property = "sname" />
+			<result column = "sinfo" property = "sinfo" />
+			<result column = "spraise" property = "spraise" />
+			<result column = "soppose" property = "soppose" />
+			<result column = "sstate" property = "sstate" />
+			<result column = "sdate" property = "sdate" />
+		</association >
+	</resultMap >
+	<resultMap id = "Schem_stageIoResultMap" type = "Scheme_stageIo" >
+		<id column = "ssid" property = "ssid" />
+		<result column = "scscid" property = "scscid" />
+		<result column = "scname" property = "scname" />
+		<result column = "scinfo" property = "scinfo" />
+		<collection property = "scheme" ofType = "Scheme" >
+			<id column = "sid" property = "sid" />
+			<result column = "scid" property = "scid" />
+			<result column = "urid" property = "urid" />
+			<result column = "sname" property = "sname" />
+			<result column = "sinfo" property = "sinfo" />
+			<result column = "spraise" property = "spraise" />
+			<result column = "soppose" property = "soppose" />
+			<result column = "sstate" property = "sstate" />
+			<result column = "sdate" property = "sdate" />
+		</collection >
+		<collection property = "scheme_shop" ofType = "Scheme_shop" >
+			<id column = "sssid" property = "sssid" />
+			<result column = "shopid" property = "shopid" />
+			<result column = "ssid" property = "ssid" />
+			<result column = "ssort" property = "ssort" />
+			<result column = "ssad" property = "ssad" />
+			<result column = "ssimgs" property = "ssimgs" />
+			<result column = "sreplace" property = "sreplace" />
+		</collection >
+		<collection property = "shop" ofType = "Shop" >
+			<id column = "sid" property = "sid" />
+			<result column = "zid" property = "zid" />
+			<result column = "bid" property = "bid" />
+			<result column = "scid" property = "scid" />
+			<result column = "sname" property = "sname" />
+			<result column = "saddress" property = "saddress" />
+			<result column = "stel" property = "stel" />
+			<result column = "scoordinate" property = "scoordinate" />
+			<result column = "scommerce" property = "scommerce" />
+			<result column = "sstate" property = "sstate" />
+			<result column = "syear" property = "syear" />
+			<result column = "sstyle" property = "sstyle" />
+			<result column = "slevel" property = "slevel" />
+			<result column = "scompartmentnum" property = "scompartmentnum" />
+			<result column = "stcompartment" property = "stcompartment" />
+			<result column = "scompartmentinfo" property = "scompartmentinfo" />
+			<result column = "scompartmentmin" property = "scompartmentmin" />
+			<result column = "smax" property = "smax" />
+			<result column = "smeetingplace" property = "smeetingplace" />
+			<result column = "sad" property = "sad" />
+			<result column = "sinfo" property = "sinfo" />
+			<result column = "ssmeetingplacemin"
+			        property = "ssmeetingplacemin" />
+			<result column = "ssort" property = "ssort" />
+			<result column = "sbalancetype" property = "sbalancetype" />
+			<result column = "sbwx" property = "sbwx" />
+			<result column = "sbzfb" property = "sbzfb" />
+			<result column = "sbyhk" property = "sbyhk" />
+		</collection >
+	</resultMap >
+
+	<select id = "getClassSname" parameterType = "String"
+	        resultType = "Scheme_class" >
+		select scid,scname from scheme_class
+	</select >
+
+	<select id = "getStageMessage" parameterType = "Integer"
+	        resultType = "Scheme_stageIo" >
+		select a1.ssid,a1.sid,a1.ssname,a1.ssinfo,a2.shopid from
+		scheme_stage a1 INNER JOIN s_s_shop a2 ON a1.ssid = a2.ssid
+		INNER JOIN
+		shop a3 ON a2.shopid = a3.sid INNER JOIN scheme a4 ON a1.sid =
+		a4.sid
+		where a1.sid=#{sid} order by a2.ssort desc
+	</select >
+	
+	<!--删除方案下阶段 -->
+	<delete id = "deleteStage" parameterType = "Integer" >
+		delete from scheme_stage
+		where ssid = #{ssid}
+	</delete >
+	
+	<!-- 修改阶段 -->
+	<update id = "updateStage" parameterType = "Scheme_stage" >
+		update scheme_stage
+		<set >
+			<if test = "ssname != null" >ssname = #{ssname},</if >
+			<if test = "ssinfo != null" >ssinfo = #{ssinfo},</if >
+		</set >
+		where ssid = #{ssid}
+	</update >
+	
+	<!--新增阶段 -->
+	<insert id = "addStage" parameterType = "Scheme_stage" >
+		<selectKey resultType = "int" order = "AFTER" keyProperty = "ssid" >
+			SELECT LAST_INSERT_ID()
+		</selectKey >
+		insert into scheme_stage
+		(sid,ssname,ssinfo)
+		values(#{sid},#{ssname},#{ssinfo})
+	</insert >
+
+	<select id = "getOne" parameterType = "Integer"
+	        resultType = "Scheme_stage" >
+		select sid,ssname,ssinfo from scheme_stage where ssid =
+		#{ssid}
+	</select >
+	<select id = "findSchemeStageBySid" parameterType = "Integer"
+	        resultType = "Integer" >
+		SELECT COUNT(ss.`sid`)
+		FROM `scheme_stage` ss
+		WHERE
+		ss.`sid`=#{sid}
+	</select >
+
+	<select id = "infoMessage" resultMap = "BaseResultMap" >
+		select
+		a1.ssid,a1.ssname,a1.ssinfo,a2.sname from scheme_stage a1
+		LEFT JOIN
+		scheme a2
+		on a1.sid = a2.sid where 1= 1
+	</select >
+
+
+	<resultMap type = "SchemeAlternativeShop"
+	           id = "SchemeAlternativeShop" >
+		<id column = "ssid" property = "ssid" />
+		<result column = "sid" property = "sid" />
+		<result column = "sname" property = "sname" />
+		<result column = "sad" property = "sad" />
+		<result column = "slogo" property = "slogo" />
+		<result column = "styleimg" property = "styleimg" />
+		<result column = "sreplace" property = "sreplace" />
+	</resultMap >
+	
+	
+	<!--备选商家 -->
+	<select id = "foundAlternateMerchant"
+	        resultMap = "SchemeAlternativeShop" >
+		SELECT ss.`ssid`, sh.`sid`,ss.`sreplace`,
+		sh.`sname`,sh.`sad`,sh.`slogo`,sh.`styleimg`
+		FROM
+		`s_s_shop` ss
+		LEFT JOIN
+		`shop` sh ON FIND_IN_SET(sh.`sid`,ss.sreplace)
+		WHERE ss.ssid in
+		<foreach collection = "ssids" item = "ssid" open = "(" close = ")"
+		         separator = "," >
+			#{ssid}
+		</foreach >
+		GROUP BY sh.`sid`,ss.ssid
+	</select >
+	
+	
+	<resultMap type = "StageGoodsResponse"
+	           id = "StageGoodsResponseMap" >
+		<result column = "id" property = "id" />
+		<result column = "pname" property = "pname" />
+		<result column = "ssid" property = "ssid" />
+		<result column = "cid" property = "cid" />
+		<result column = "sid" property = "sid" />
+		<result column = "sname" property = "sname" />
+		<result column = "price" property = "price" />
+		<result column = "yprice" property = "yprice" />
+		<result column = "url" property = "url" />
+		<result column = "slogo" property = "slogo" />
+		<result column = "stel" property = "stel" />
+		<result column = "scommerce" property = "scommerce" />
+		<result column = "saddress" property = "saddress" />
+	</resultMap >
+	<!--阶段下商品 -->
+	<select id = "foundProductInformation"
+	        resultMap = "StageGoodsResponseMap" >
+		SELECT pt.`id`,pt.`pname`,pt.`cid`,pt.`sid`,sh.`sname`,pt.`price`,pt.`yprice`,
+		pg.`url`,sh.`slogo`,sh.`stel`,sh.`scommerce`,sh.`saddress`
+		FROM `product` pt
+		LEFT  JOIN `productimg` pg ON pt.`id`=pg.`pid`
+		LEFT JOIN `shop` sh ON pt.`sid`=sh.`sid`
+		WHERE pt.`id`IN
+		<foreach collection = "ids" item = "id" open = "(" close = ")"
+		         separator = "," >
+			#{id}
+		</foreach >
+	</select >
+
+
+
+	<resultMap type = "SchemeAndStageResponse"
+	           id = "SchemeAndStageResponse" >
+		<id column = "sid" property = "sid" />
+		<result column = "ssid" property = "ssid" />
+		<result column = "shopid" property = "shopid" />
+		<result column = "ssname" property = "ssname" />
+		<result column = "ssinfo" property = "ssinfo" />
+		<result column = "sad" property = "sad" />
+		<result column = "sname" property = "sname" />
+		<result column = "slogo" property = "slogo" />
+		<result column = "styleimg" property = "styleimg" />
+		<result column = "lsnum" property = "lsnum" />
+		<result column = "labels" property = "labels" />
+		<result column = "sssid" property = "sssid" />
+		<result column = "ssimgs" property = "ssimgs" />
+		<result column = "lssid" property = "lssid" />
+
+	</resultMap >
+	
+	<!--所属方案阶段信息 -->
+	<select id = "foundSchemeAndStage"
+	        resultMap = "SchemeAndStageResponse" >
+		SELECT sch.ssid,sch.sid,sch.ssname,sch.ssinfo,ss.`sssid`,
+		ss.`shopid`,lss.`lsnum`,lss.labels
+		,lss.lssid
+		FROM
+		`scheme_stage` sch
+		LEFT JOIN `s_s_shop` ss
+		ON
+		sch.ssid=ss.`ssid`
+		
+		LEFT JOIN
+		(SELECT
+		lss.`sid`AS sid,
+		GROUP_CONCAT(CONCAT(lss.`lsnum`)) AS lsnum,
+		GROUP_CONCAT(CONCAT(lss.`lssid`)) AS lssid,
+		GROUP_CONCAT(CONCAT(la.`lcinfo`)) AS labels
+		FROM
+		`label_scheme_sum` lss
+		LEFT JOIN `label` la ON FIND_IN_SET(la.lid,lss.lid)
+		AND lss.`lstype`=1
+		GROUP BY lss.sid)
+		lss
+		ON lss.`sid`=sch.ssid
+		WHERE
+		sch.`sid`=#{sid}
+		GROUP BY
+		sch.ssid
+	</select >
+
+
+	<resultMap type = "Scheme_stage" id = "Scheme_stage" >
+		<id column = "ssid" property = "ssid" />
+		<result column = "sid" property = "sid" />
+		<result column = "ssname" property = "ssname" />
+		<result column = "ssinfo" property = "ssinfo" />
+	</resultMap >
+	<select id = "getSchemeStageById" parameterType = "Integer"
+	        resultMap = "Scheme_stage" >
+		select ss.`ssid`, ss.`ssname`,ss.`ssinfo`
+		from `scheme_stage`
+		ss
+		where ss.`sid`=#{sid}
+	</select >
+
+</mapper >

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.PositionDao">
+	<resultMap id="User_position" type="User_position">
+		<id column="upid" property="upid" />
+		<result column="urid" property="urid" />
+		<result column="cid" property="cid" />
+		<result column="pid" property="pid" />
+		<result column="upsort" property="upsort" />
+		<result column="upsdate" property="upsdate" />
+		<result column="upodate" property="upodate" />
+		<association property="sys_user" javaType="Sys_User">
+		<id column="id" property="id"/>
+		<result column="username" property="username"/>
+		<result column="password" property="password"/>
+		<result column="salt" property="salt"/>
+		<result column="create_time" property="create_time"/>
+		<result column="state" property="state"/>
+		<result column="real_name" property="real_name"/>
+		<result column="gender" property="gender"/>
+		<result column="nation" property="nation"/>
+		<result column="birth" property="birth"/>
+		<result column="urautograph" property="urautograph"/>
+		<result column="mobile" property="mobile"/>
+		<result column="email" property="email"/>
+		<result column="department" property="department"/>
+		<result column="position" property="position"/>
+		<result column="note" property="note"/>
+		<result column="head" property="head"/>
+		<result column="activate_time" property="activate_time"/>
+		<result column="code" property="code"/>
+		<result column="maileCode" property="maileCode"/>
+		<result column="wx_OpenId" property="wx_OpenId"/>
+		<result column="qq_openid" property="qq_openid"/>
+		<result column="zfb_openid" property="zfb_openid"/>
+		<result column="referee" property="referee"/>
+		
+		</association>
+		<!-- <association property="user" javaType="User">
+		<id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="createTime" column="create_time"/>
+        <result property="state" column="state"/>
+        <result property="realName" column="real_name"/>
+        <result property="gender" column="gender"/>
+        <result property="nation" column="nation"/>
+        <result property="birth" column="birth"/>
+        <result property="urtname" column="urtname"/>
+        <result property="urautograph" column="urautograph"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="department" column="department"/>
+        <result property="position" column="position"/>
+        <result property="note" column="note"/>
+        <result property="head" column="head"/>
+        <result property="activateTime" column="activate_time"/>
+        <result property="code" column="code"/>
+		<result property="maileCode" column="maileCode"/>
+		</association> -->
+		<association property="company" javaType="Company">
+		<id column="cid" property="cid" />
+		<result column="zid" property="zid" />
+		<result column="cname" property="cname" />
+		<result column="cgeneral_taxpayer" property="cgeneral_taxpayer" />
+		<result column="cidentify" property="cidentify" />
+		<result column="ccode" property="ccode" />
+		<result column="caddress" property="caddress" />
+		<result column="cbank" property="cbank" />
+		<result column="caccount" property="caccount" />
+		<result column="ctel" property="ctel" />
+		<result column="cinfo" property="cinfo" />
+		</association>
+		<association property="position" javaType="Position">
+		<id column="pid" property="pid" />
+		<result column="pname" property="pname" />
+		<result column="pinfo" property="pinfo" />
+		</association>
+	</resultMap>
+	<select id="queryAll" resultMap="User_position">
+		select a1.upid,a1.urid,a1.cid,a1.pid,a1.upsort,a1.upsdate,a1.upodate,a2.username,a3.cname,a4.pname from user_position a1
+			inner join sys_user a2 on a2.id = a1.urid
+			inner JOIN company a3 on a3.cid = a1.cid
+			inner JOIN position a4 on a4.pid = a1.pid
+		order by upid
+	</select>
+	<delete id="deletePositon" parameterType="Integer">
+	delete from user_position where upid = #{upid}
+	</delete>
+	<select id="selPositionById" parameterType="Integer" resultMap="User_position">
+	select * from user_position where upid = #{upid}
+	</select>
+	<update id="updatePosition" parameterType="User_position">
+		update user_position set 
+		urid=#{urid},
+		cid=#{cid},
+		pid=#{pid},
+		upsort=#{upsort},
+		upsdate=#{upsdate},
+		upodate=#{upodate}
+		where upid = #{upid}
+	</update>
+	
+	<insert id="addPosition" parameterType="User_position" useGeneratedKeys="true" keyProperty="upid">
+		insert into user_position (urid,cid,pid,upsort,upsdate,upodate)values(#{urid},#{cid},#{pid},#{upsort},#{upsdate},#{upodate})
+	</insert>
+	
+</mapper>

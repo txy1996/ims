@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.PreferenceDao">	
+	
+	<resultMap type="Preference" id="resultPreference">
+     	<id property="pid" column="pid" />
+     	<result property="lid" column="lid"/>
+     	 <result property="urid" column="urid"/>
+     	 <result property="ptype" column="ptype"/>
+     	 <result property="prdate" column="prdate"/>
+        <result property="pinfo" column="pinfo"/>
+        <result property="pnumber" column="pnumber"/>     
+        <association property="user" javaType="User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="createTime" column="create_time"/>
+        <result property="state" column="state"/>
+        <result property="realName" column="real_name"/>
+        <result property="gender" column="gender"/>
+        <result property="nation" column="nation"/>
+        <result property="birth" column="birth"/>
+        <result property="urtname" column="urtname"/>
+        <result property="urautograph" column="urautograph"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="department" column="department"/>
+        <result property="position" column="position"/>
+        <result property="note" column="note"/>
+        <result property="head" column="head"/>
+        <result property="activateTime" column="activate_time"/>
+        <result property="code" column="code"/>          
+        </association>
+    </resultMap>
+	
+	<select id="findyhbyid" parameterType="int" resultType="int">
+		SELECT SUM(pnum) FROM preference WHERE lid=#{lid}
+	</select>
+
+	<select id="findname" parameterType="int" resultType="string">
+		SELECT b.username FROM preference a INNER JOIN sys_user b 
+		ON a.urid=b.id AND a.lid=#{lid}
+	</select>
+	
+</mapper>

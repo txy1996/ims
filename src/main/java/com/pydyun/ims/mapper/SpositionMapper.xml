@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.PositionDao">
+	<resultMap id="positionResultMap" type="Position">
+		<id column="pid" property="pid" />
+		<result column="pname" property="pname" />
+		<result column="pinfo" property="pinfo" />
+	</resultMap>
+	
+	<select id="getMessage" parameterType="String" resultType="Position">
+		select pid,pname from position
+	</select>
+</mapper>

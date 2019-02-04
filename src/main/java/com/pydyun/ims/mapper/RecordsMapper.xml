@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.RecordsDao">
+
+	<select id="findnumber" parameterType="String" resultType="Integer">
+		SELECT 	SUM(rnumber) FROM records WHERE 1=1
+		<if test="_parameter!= null and _parameter!= ''">
+           AND vrange=#{vrange} AND vorc=0	
+       </if>
+		
+	</select>
+
+	<select id="findnumber1" parameterType="String" resultType="Integer">
+		SELECT 	SUM(rnumber) FROM records WHERE 1=1
+		<if test="_parameter!= null and _parameter!= ''">
+           AND vrange=#{vrange} AND vorc=1	
+       </if>
+		
+	</select>
+	
+	<insert id="addReVoucher" parameterType="Records" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO records (id,vrange, regdate,rnumber,vorc,uaid) 
+		VALUES (#{id},#{vrange},#{regdate},#{rnumber},#{vorc},#{uaid})
+	</insert>
+
+	<select id="findid" resultType="Integer">
+		SELECT MAX(id) FROM records
+	</select>
+</mapper>

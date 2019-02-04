@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.CouponDao">
+	<resultMap id="SetResultMap" type="Coupon">
+		<result column="cid" property="cid" />
+		<result column="ccid" property="ccid" />
+		<result column="crid" property="crid" />
+		<result column="csdate" property="csdate" />
+		<result column="codate" property="codate" />
+		<result column="crange" property="crange" />
+		<result column="cdiscount" property="cdiscount" />
+		<result column="csum" property="csum" />
+		<result column="cfullcut" property="cfullcut" />
+		<result column="cisood" property="cisood" />
+		<result column="cintegration" property="cintegration" />
+		<result column="cmoney" property="cmoney" />
+		<result column="cprice" property="cprice" />
+		<result column="cgoods" property="cgoods" />
+		<result column="cimg" property="cimg" />
+		<result column="ctitle" property="ctitle" />
+		<result column="cinfo" property="cinfo" />
+		<result column="crefund" property="crefund" />
+		<result column="cisrepeat" property="cisrepeat" />
+		<result column="uaid" property="uaid" />
+		<result column="cnum" property="cnum" />
+		<result column="cstore" property="cstore" />
+		<result column="xdprice" property="xdprice" />
+		<result column="xdpcid" property="xdpcid" />
+		<association property="adminusers" javaType="Adminusers">
+		<result property="auid" column="auid" />
+			<result property="dtid" column="dtid" />
+			<result property="auname" column="auname" />
+			<result property="aupwd" column="aupwd" />
+			<result property="aurdate" column="aurdate" />
+			<result property="auldate" column="auldate" />
+			<result property="aulip" column="aulip" />
+		</association>
+		<association property="couponclass" javaType="Couponclass">
+		<result property="ccid" column="ccid" />
+			<result property="ccname" column="ccname" />
+			<result property="ccinfo" column="ccinfo" />
+			<result property="ccccid" column="ccccid" />
+		</association>
+
+	</resultMap>
+	<select id="select" resultMap="SetResultMap">
+		select a1.* ,a2.ccname from coupon a1,couponclass a2
+		where a1.ccid =a2.ccid ORDER BY cid
+	</select>
+		<insert id="add" parameterType="Coupon" useGeneratedKeys="true"
+		keyProperty="cid">
+		insert into coupon(ccid,csdate,codate,crange,cdiscount,csum,cfullcut,cisood,cintegration,cmoney,cprice,cgoods,cimg,ctitle,cinfo,crefund,cisrepeat,uaid)
+		values(#{ccid},#{csdate},#{codate},#{crange},#{cdiscount},#{csum},#{cfullcut},#{cisood},#{cintegration},#{cmoney},#{cprice},#{cgoods},#{cimg},#{ctitle},#{cinfo},#{crefund},#{cisrepeat},#{uaid})
+		</insert>
+		<delete id = "delete" parameterType="Integer">
+    delete from coupon where cid = #{cid}
+    </delete>
+    
+    <select id="getcoupon" parameterType="Integer" resultMap="SetResultMap">
+    	select a1.* ,a2.ccname from coupon a1,couponclass a2
+		where a1.ccid =a2.ccid and a1.cid = #{cid}
+    </select>
+    <update id="update" parameterType="Coupon">
+    	update coupon set
+		ccid = #{ccid},csdate = #{csdate},codate = #{codate},crange = #{crange},cdiscount = #{cdiscount},csum = #{csum},cfullcut = #{cfullcut},cisood = #{cisood},
+		cintegration = #{cintegration},cmoney = #{cmoney},cprice = #{cprice},cgoods = #{cgoods},cimg = #{cimg},ctitle = #{ctitle},cinfo = #{cinfo},crefund = #{crefund},
+		cisrepeat = #{cisrepeat},uaid = #{uaid}
+		where cid = #{cid}
+    </update>
+    
+    <select id="getMessage" parameterType="Integer" resultMap="SetResultMap">
+    	select a1.* ,a2.ccname FROM coupon AS a1 INNER JOIN couponclass AS a2 ON a1.ccid = a2.ccid
+		where a1.cid = #{cid}
+    </select>
+    
+    <select id="findbys" parameterType="String" resultType="Coupon">
+		SELECT ctitle FROM coupon WHERE crange LIKE '%${crange}%'
+	</select>
+	
+		<insert id="addMessage1" parameterType="Coupon" useGeneratedKeys="true"
+		keyProperty="cid">
+		INSERT INTO coupon (ccid,crid,csdate,codate,crange,cdiscount,csum,cfullcut,cisood,cintegration,cmoney,cprice,cgoods,cimg,ctitle,cinfo,crefund,cisrepeat,uaid,cnum,cstore,xdprice,xdpcid) 
+		VALUES (#{ccid},#{crid},#{csdate},#{codate},#{crange},#{cdiscount},#{csum},#{cfullcut},#{cisood},#{cintegration},#{cmoney},#{cprice},#{cgoods},#{cimg},#{ctitle},#{cinfo},#{crefund},#{cisrepeat},#{uaid},#{cnum},#{cstore},#{xdprice},#{xdpcid})
+	</insert>
+	<insert id="addcou" parameterType="Coupon" useGeneratedKeys="true"
+		keyProperty="cid">
+		INSERT INTO coupon (ccid,crid,csdate,codate,crange,cdiscount,csum,cfullcut,cisood,cintegration,cmoney,cprice,cgoods,cimg,ctitle,cinfo,crefund,cisrepeat,uaid) 
+		VALUES (#{ccid},#{crid},#{csdate},#{codate},#{crange},#{cdiscount},#{csum},#{cfullcut},#{cisood},#{cintegration},#{cmoney},#{cprice},#{cgoods},#{cimg},#{ctitle},#{cinfo},#{crefund},#{cisrepeat},#{uaid})
+	</insert>
+	
+	<update id="update1">
+		UPDATE coupon c SET c.codate = DATE_ADD(c.codate, INTERVAL #{codate} DAY) WHERE c.cid =#{cid};
+	</update>
+	
+	
+	<select id="findall1" resultType="Coupon">
+		SELECT a.`cid`,a.`ctitle`,a.`cmoney`,a.`cprice`,a.`crange`,a.`cnum`,a.`cstore`,a.`csdate`,a.`codate` 
+		FROM coupon a WHERE a.`crange`=#{crange} and a.cstore!=0
+	 <if test="csdate !=null">
+		and a.csdate &gt;= '${csdate}'
+	</if>
+	<if test="codate !=null">
+		and a.codate &lt;= '${codate}'
+	</if> 
+	<if test="cstore !=null">
+		and a.`cstore` BETWEEN #{cstore} AND #{cstore2}
+	</if>
+	</select>
+	
+	<select id="getmessage1" parameterType="int" resultType="Coupon">
+		SELECT a.`cid`,a.`ctitle`,a.`cmoney`,a.`cprice`,a.`crange`,a.`cnum`,a.`cstore`,a.`csdate`,a.`codate` 
+		FROM coupon a WHERE a.cid=#{cid}
+	</select>
+
+	<update id="update2">
+		UPDATE coupon  SET 
+		ctitle=#{ctitle},cmoney=#{cmoney},cprice=#{cprice},
+		crange=#{crange},cnum=#{cnum},cstore=#{cstore},
+		csdate=#{csdate},codate=#{codate} 
+		where cid=#{cid}
+	</update>
+	
+	<update id="deleteshopcoupon" parameterType="int">
+		UPDATE coupon  SET cstore=0 where cid=#{cid}
+	</update>
+	
+	<select id="findbyid" parameterType="java.lang.Integer" resultType="Coupon">
+		 SELECT crid,crange,ctitle FROM coupon WHERE cid=#{cid}
+	</select>
+	
+	<update id="updatecstore" parameterType="java.lang.Integer">
+		UPDATE coupon SET cstore=cstore-#{cstore} WHERE cid=#{cid}
+	</update>
+	
+	<select id="selectimg" parameterType="java.lang.Integer" resultType="java.lang.String">
+		select cimg from coupon where cid=#{cid}
+	</select>
+	
+	</mapper>

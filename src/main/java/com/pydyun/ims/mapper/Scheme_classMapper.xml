@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.Scheme_classDao">
+	<resultMap id="BaseResultMap" type="Scheme_class">
+		<id column="scid" property="scid" />	
+		<result column="scscid" property="scscid" />
+		<result column="scname" property="scname" />
+		<result column="scinfo" property="scinfo" />
+	</resultMap>
+	<select id="getClassSname" parameterType="String" resultType="Scheme_class">
+		select scid,scname from scheme_class
+	</select>
+	
+	<!-- 新增查询某个子类下面的全部分类信息的方法，如果为0或者没有参数就查询全部 -->
+	<select id="getlistByScscid"  parameterType="int" resultMap="BaseResultMap">
+		select scid,scname,scinfo,scscid from scheme_class
+		<if test="scscid != null and scscid>=0">
+		   where scscid=#{scscid}
+		</if>
+	</select>
+	
+	<select id="getClassList" resultType="Scheme_class">
+		select scid,scname,scinfo,scscid from scheme_class order by scheme_class(scid) asc
+	</select>
+	
+	<select id="getClassIdAndNmae" resultType="Scheme_class">
+		select scid,scname from scheme_class
+	</select>
+	
+	<select id="getOneMessage" resultType="Scheme_class">
+		select * from scheme_class
+	</select>
+	
+	<delete id="deleteByScid" parameterType="int">
+		delete from scheme_class where scid=#{scid}
+	</delete>
+	
+	<insert id="addClass" parameterType="Scheme_class" useGeneratedKeys="true" keyProperty="scid">
+		insert into scheme_class(scid,scscid,scname,scinfo)
+		values(#{scid},#{scscid},#{scname},#{scinfo})
+	</insert>
+	
+	<update id="updateClass" parameterType="Scheme_class">
+		update scheme_class
+		<set>
+			<if test="scscid != null">scscid=#{scscid},</if>
+			<if test="scname != null">scname=#{scname},</if>
+			<if test="scinfo != null">scinfo=#{scinfo},</if>
+		</set>
+		where scid = #{scid}
+	</update>
+	<select id="getid" parameterType="java.lang.String" resultType="Integer">
+		select scscid from scheme_class where scname=#{scname}
+	</select>
+	<!-- <select id="findIdAndName1" resultType="ShopCation">
+		select scscid,scname from shopclass
+	</select> -->
+	
+	<select id="findscscid1" parameterType="int" resultType="Scheme_class">
+		select * from scheme_class where scscid=#{scscid}
+	</select>
+	
+	<select id="findscscname" parameterType="int" resultType="String">
+		select scname from scheme_class where scid=#{scid}
+	</select>
+	
+	<select id="findscid" parameterType="String" resultType="int">
+		select scid from scheme_class where scname=#{scname}
+	</select>
+</mapper>

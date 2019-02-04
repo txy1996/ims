@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.StageDao">
+	<resultMap id="stageResultMap" type="Stage">
+		<id column="ssid" property="ssid" />
+		<result column="sid" property="sid" />
+		<result column="ssname" property="ssname" />
+		<result column="ssinfo" property="ssinfo" />
+		<association property="scheme" javaType="Scheme">
+			<id column="sid" property="sid" />
+			<result column="scid" property="scid" />
+			<result column="urid" property="urid" />
+			<result column="sname" property="sname" />
+			<result column="sinfo" property="sinfo" />
+			<result column="spraise" property="spraise" />
+			<result column="soppose" property="soppose" />
+			<result column="sstate" property="sstate" />
+			<result column="sdate" property="sdate" />
+		</association>
+	</resultMap>
+	
+	<select id="getStageMessage" resultMap="stageResultMap">
+		select
+		a1.ssid,a1.sid,a1.ssname,a1.ssinfo,a2.sname from scheme_stage a1
+		LEFT
+		JOIN scheme a2
+		on a1.sid = a2.sid where 1= 1
+	</select>
+
+	<insert id="creStage" useGeneratedKeys="true" keyProperty="ssid"
+		parameterType="Stage">
+		insert into scheme_stage
+		(sid,ssname,ssinfo)values(#{sid},#{ssname},#{ssinfo})
+	</insert>
+
+	<delete id="deleteStage" parameterType="Integer">
+		delete from scheme_stage where ssid = #{ssid}
+	</delete>
+
+	<update id="updateStage" parameterType="Stage">
+		update scheme_stage set
+		sid =#{sid},
+		ssname = #{ssname},
+		ssinfo = #{ssinfo}
+		where ssid = #{ssid}
+	</update>
+
+	<select id="getOne" parameterType="Integer"
+		resultMap="stageResultMap">
+		select a1.ssid,a1.sid,a1.ssname,a1.ssinfo,a2.sname from scheme_stage a1
+		LEFT
+		JOIN scheme a2
+		on a1.sid = a2.sid where a1.ssid = #{ssid}
+	</select>
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.UserVoucherDao">
+
+		<resultMap id="uvlog" type="U_v_log">
+		<id column="uvlid" property="uvlid" />
+		<result column="vid" property="vid" />
+		<result column="sid" property="sid" />
+		<result column="tourid" property="tourid" />
+		<result column="urid" property="urid" />
+		<result column="auid" property="auid" />
+		<result column="uvlgetdate" property="uvlgetdate" />
+		<result column="uvlgetchannel" property="uvlgetchannel" />
+		<result column="uvltype" property="uvltype" />
+		<result column="uvlInvalid" property="uvlInvalid" />
+		<result column="uvlstate" property="uvlstate" />
+		<result column="uvlassess" property="uvlassess" />
+		<result column="uvinfo" property="uvinfo" />
+		<result column="uvcode" property="uvcode" />
+		<result column="uvimg" property="uvimg" />
+		<association property="s" javaType="Shop">
+		<id column="scid" property="scid" />
+		<result column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="bid" property="bid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />	
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		<result column="slogo" property="slogo" />
+		<result column="styleimg" property="styleimg" />
+		</association>	
+		<association property="sb" javaType="ShopBrand">
+		<id column="bid" property="bid" />
+		<result column="bname" property="bname" />
+		<result column="binfo" property="binfo" />
+		</association>		
+		<association property="vou" javaType="Voucher">
+		<id column="vid" property="vid" />
+		<result column="vcid" property="vcid" />
+		<result column="vrid" property="vrid" />
+		<result column="vrange" property="vrange" />
+		<result column="vmoney" property="vmoney" />
+		<result column="vcost" property="vcost" />
+		<result column="vprice" property="vprice" />
+		<result column="vsdate" property="vsdate" />
+		<result column="vodate" property="vodate" />
+		<result column="visood" property="visood" />
+		<result column="vgoods" property="vgoods" />
+		<result column="vintegration" property="vintegration" />
+		<result column="vimg" property="vimg" />
+		<result column="vtitle" property="vtitle" />
+		<result column="vinfo" property="vinfo" />
+		<result column="vrefund" property="vrefund" />
+		<result column="uaid" property="uaid" />
+		<result column="binfo" property="binfo" />
+		</association>
+	</resultMap>
+
+
+	<select id="findall" parameterType="int" resultMap="uvlog">
+		SELECT uv.uvlid,vou.vtitle,vou.vmoney,vou.vprice,vou.vrange,uv.uvlstate,vou.vsdate,vou.vid,
+		vou.vodate,uv.sid,c.bname,uv.uvltype,uv.uvinfo,uv.uvlInvalid
+		FROM u_v_log uv inner JOIN voucher vou ON uv.vid=vou.vid
+		AND uv.urid=#{urid}
+		left JOIN (SELECT a.sid,b.bname FROM shop a inner JOIN brand b ON a.bid=b.bid) c 
+		ON uv.sid=c.sid
+	<if test="vsdate !=null">
+		and vou.vsdate &gt;= '${vsdate}'
+	</if>
+	<if test="vodate !=null">
+		and vou.vodate &lt;= '${vodate}'
+	</if>
+	<if test="uvlstate !=null">
+		and uv.uvlstate=#{uvlstate}
+	</if> 
+	<!-- and uv.`uvlInvalid` IS NULL -->
+	</select>
+	
+	<select id="select" resultType="U_v_log">
+		select * from u_v_log
+	</select>
+	
+	<update id="update">
+		UPDATE u_v_log SET uvinfo= #{uvinfo},uvlstate=0,uvlInvalid=#{uvlInvalid} WHERE uvlid = #{uvlid}
+	</update>
+	
+	<update id="update1">
+		UPDATE u_v_log SET uvinfo= #{uvinfo},uvlstate=2 WHERE uvlid = #{uvlid}
+	</update>
+	
+	<insert id="insertuvlog" parameterType="U_v_log" useGeneratedKeys="true"
+		keyProperty="uvlid">
+		
+		INSERT INTO u_v_log (uvlid,vid,urid,uvlgetdate,uvlgetchannel,uvltype,uvcode,uvimg,uvlstate)
+		VALUES(#{uvlid},#{vid},#{urid},#{uvlgetdate},#{uvlgetchannel},#{uvltype},#{uvcode},#{uvimg},#{uvlstate})
+		
+		</insert>
+	
+	<select id="selectmaxid" resultType="java.lang.Integer">
+		SELECT MAX(uvlid) FROM u_v_log	
+	</select>
+	<update id="alterTable">
+		ALTER TABLE u_v_log AUTO_INCREMENT = 1;
+	</update>
+	
+	<select id="findvid" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT vid FROM u_v_log WHERE urid=#{urid}
+	</select>
+	
+</mapper>

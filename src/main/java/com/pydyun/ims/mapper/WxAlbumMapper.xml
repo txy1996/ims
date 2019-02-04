@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxAlbumDao">
+	<resultMap id="SetResultMap" type="WxAlbum">
+		<result column="aid" property="aid" />
+		<result column="sid" property="sid" />
+		<result column="ssid" property="ssid" />
+		<result column="faid" property="faid" />
+		<result column="aname" property="aname" />
+		<result column="ainfo" property="ainfo" />
+		<result column="aimg" property="aimg" />
+		<result column="urid" property="urid" />
+		<result column="auid" property="auid" />
+		<result column="adate" property="adate" />
+        <association property="wximages" javaType="WxImages">
+		<id column="aid" property="aid" />
+        <result column="iid" property="iid" />
+		<result column="iname" property="iname" />
+		<result column="iurl" property="iurl" />
+		<result column="iimgurl" property="iimgurl" />
+		<result column="idate" property="idate" />
+        </association>
+	</resultMap>
+	<select id="selectaid" parameterType="Integer" resultMap="SetResultMap">
+	select i.iurl from album a,images i where a.aid = i.aid and a.aid = #{aid}
+	</select>
+</mapper>

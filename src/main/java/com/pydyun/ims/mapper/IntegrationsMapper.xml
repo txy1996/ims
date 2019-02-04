@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- �û����ֱ� -->
+<mapper namespace="com.pydyun.ims.dao.IntegrationsDao">
+	<resultMap id="SetResultMap" type="Integrations">
+		<id column="urid" property="urid" />
+		<result column="iid" property="iid" />
+		<result column="igetdate" property="igetdate" />
+		<result column="igetinfo" property="igetinfo" />
+		<result column="igetnum" property="igetnum" />
+		<result column="isum" property="isum" />
+		<association property="sys_user" javaType="Sys_User">
+			<id column="id" property="id" />
+			<result column="username" property="username" />
+			<result column="password" property="password" />
+			<result column="salt" property="salt" />
+			<result column="create_time" property="create_time" />
+			<result column="state" property="state" />
+			<result column="real_name" property="real_name" />
+			<result column="gender" property="gender" />
+			<result column="nation" property="nation" />
+			<result column="birth" property="birth" />
+			<result column="urautograph" property="urautograph" />
+			<result column="mobile" property="mobile" />
+			<result column="email" property="email" />
+			<result column="department" property="department" />
+			<result column="position" property="position" />
+			<result column="note" property="note" />
+			<result column="head" property="head" />
+			<result column="activate_time" property="activate_time" />
+			<result column="code" property="code" />
+			<result column="maileCode" property="maileCode" />
+			<result column="wx_OpenId" property="wx_OpenId" />
+			<result column="qq_openid" property="qq_openid" />
+			<result column="zfb_openid" property="zfb_openid" />
+			<result column="referee" property="referee" />
+
+		</association>
+		<!-- <association property="users" javaType="Users"> <id column="urid" 
+			property="urid"/> <id column="zid" property="zid"/> <id column="utid" property="utid"/> 
+			<id column="urname" property="urname"/> <id column="urpwd" property="urpwd"/> 
+			<id column="urfname" property="urfname"/> <id column="urtname" property="urtname"/> 
+			<id column="urtel" property="urtel"/> <id column="ursex" property="ursex"/> 
+			<id column="urbirthday" property="urbirthday"/> <id column="urface" property="urface"/> 
+			<id column="urautograph" property="urautograph"/> <id column="referee" property="referee"/> 
+			<id column="wx_OpenId" property="wx_OpenId"/> <id column="qq_openid" property="qq_openid"/> 
+			<id column="zfb_openid" property="zfb_openid"/> </association> -->
+	</resultMap>
+	<select id="selectintegrations" resultMap="SetResultMap">
+		select u.username,u.id,i.iid,i.igetdate,i.igetinfo,i.igetnum,i.isum
+		from sys_user
+		u,integrations i where u.id = i.urid
+		<if test="urid !=null">
+			and i.urid =#{urid}
+		</if>
+		<if test="goinfo !=null">
+			and i.igetinfo =#{goinfo}
+		</if>
+		<if test="starttime !=null and endtime !=null">
+			and i.igetdate BETWEEN concat(#{starttime}) AND
+			concat(#{endtime})
+		</if>
+		order by i.igetdate desc
+	</select>
+
+	<!-- 查询指定用户当前的积分 -->
+	<select id="seleteNumA" resultType="int" parameterType="int">
+		SELECT
+		GetUserIntegrationsNumByID(#{urid},0)
+	</select>
+	<select id="seleteNum" resultType="int" parameterType="int">
+		SELECT
+		isum
+		FROM integrations
+		WHERE urid=#{urid}
+		ORDER BY igetdate DESC LIMIT 1
+	</select>
+	<!-- 为指定的用户增加或者减少金币，并形成一条记录 -->
+	<insert id="addIntegrations" parameterType="Integrations"
+		useGeneratedKeys="true" keyProperty="iid">
+		INSERT into
+		integrations(urid,igetdate,igetinfo,igetnum,isum)
+		VALUES(#{urid},CURRENT_TIMESTAMP,#{igetinfo},#{igetnum},#{isum})
+	</insert>
+	<!--数据库函数方式 -->
+	<insert id="add" parameterType="Integrations"
+		useGeneratedKeys="true" keyProperty="iid">
+		INSERT into
+		integrations(urid,igetdate,igetinfo,igetnum,isum)
+		VALUES(#{urid},CURRENT_TIMESTAMP,#{igetinfo},#{igetnum},GetUserIntegrationsNumByID(#{urid},#{igetnum}))
+	</insert>
+
+	<delete id="delete" parameterType="int">
+		delete from integrations where
+		iid = #{iid}
+	</delete>
+
+
+</mapper>

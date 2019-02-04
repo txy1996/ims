@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.StageDao">
+	<resultMap id="baseResultMap" type="StageIo">
+		<id column="ssid" property="ssid" />
+		<result column="sid" property="sid" />
+		<result column="ssname" property="ssname" />
+		<result column="ssinfo" property="ssinfo" />
+		<collection property="scheme_shop" ofType="Scheme_Shop">
+			<id column="sid" property="sid" />
+			<result column="scid" property="scid" />
+			<result column="urid" property="urid" />
+			<result column="sname" property="sname" />
+			<result column="sinfo" property="sinfo" />
+			<result column="spraise" property="spraise" />
+			<result column="soppose" property="soppose" />
+			<result column="sstate" property="sstate" />
+			<result column="sdate" property="sdate" />
+		</collection>
+		<collection property="shop" ofType="Shop">
+		<id column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="bid" property="bid" />
+		<result column="scid" property="scid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />
+		<result column="syear" property="syear" />
+		<result column="sstyle" property="sstyle" />
+		<result column="slevel" property="slevel" />
+		<result column="scompartmentnum" property="scompartmentnum" />
+		<result column="stcompartment" property="stcompartment" />
+		<result column="scompartmentinfo" property="scompartmentinfo" />
+		<result column="scompartmentmin" property="scompartmentmin" />
+		<result column="smax" property="smax" />
+		<result column="smeetingplace" property="smeetingplace" />
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssmeetingplacemin" property="ssmeetingplacemin" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		</collection>
+	</resultMap>
+
+	<select id="getStageIoMessage" resultMap="baseResultMap">
+		select a1.*,a2.ssad,a2.ssimgs,a3.sname from scheme_stage a1,s_s_shop a2,shop a3
+		where a1.ssid = a2.ssid and a2.shopid = a3.sid 
+		order by a2.ssort desc
+	</select>
+	
+	<select id="getMessageByid" parameterType="Integer" resultMap="baseResultMap">
+		select a1.*,a2.ssad,a2.ssimgs,a3.sname from scheme_stage a1,s_s_shop a2,shop a3
+		where a1.ssid = a2.ssid and a2.shopid = a3.sid and a1.ssid = #{ssid}
+	</select>
+</mapper>

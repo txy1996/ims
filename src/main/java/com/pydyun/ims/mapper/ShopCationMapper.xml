@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.ShopCationDao">
+	<resultMap id="SetResultMap" type="ShopCation">
+		<id column="scid" property="scid" />
+		<result column="scscid" property="scscid" />
+		<result column="scname" property="scname" />
+		<result column="scinfo" property="scinfo" />
+		<association property="shop" javaType="Shop">
+		<id column="scid" property="scid" />
+		<result column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="bid" property="bid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />	
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		<result column="slogo" property="slogo" />
+		<result column="styleimg" property="styleimg" />
+		</association>
+
+	</resultMap>
+	<select id="findAllSett" resultMap="SetResultMap">
+	select scid,scscid,scname,scinfo from shopclass  ORDER BY shopclass(scid) ASC
+		<!-- select s2.sname,s1.scid,s1.scscid,s1.scname,s1.scinfo from shopclass s1,shop s2 where s1.scid = s2.scid -->
+	</select>
+	<select id="listname" parameterType="String" resultType="string">
+	select s.scname from shopclass s
+	</select>
+	<select id = "listid" parameterType="String" resultType="string">
+	select s.scscid from shopclass s
+	</select>
+	<select id="getshop" parameterType="int" resultMap="SetResultMap">
+		select * from
+		shopclass where scid = #{scid}
+	</select>
+	<delete id="delete" parameterType="int">
+		delete from shopclass where
+		scid = #{scid}
+	</delete>
+	<insert id="add" parameterType="ShopCation" useGeneratedKeys="true"
+		keyProperty="scid">
+		insert into shopclass (scid,scscid,scname,scinfo)
+		values(#{scid},#{scscid},#{scname},#{scinfo})
+	</insert>
+	<update id="updateshop" parameterType="ShopCation">
+		update shopclass
+		<set>
+			<if test="scscid != null">scscid=#{scscid},</if>
+			<if test="scname != null">scname=#{scname},</if>
+			<if test="scinfo != null">scinfo=#{scinfo},</if>
+		</set>
+		where scid = #{scid}
+	</update>
+	
+	<select id="findscscid" parameterType="int" resultMap="SetResultMap">
+		select * from shopclass where scscid=#{scscid}
+	</select>
+	
+	<select id="findscscname" resultType="String">
+		SELECT scname FROM`shopclass` WHERE scid=#{scid}
+	</select>
+</mapper>

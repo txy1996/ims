@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxUserDao">
+	<resultMap id="UserLevelResultMap" type="WxUser_level">
+		<result column="ulid" property="ulid" />
+		<result column="ulid" property="ulid" />
+		<result column="ulintegration" property="ulintegration" />
+		<result column="ulinfo" property="ulinfo" />
+	</resultMap>
+	<select id="level" parameterType="Integer" resultMap="UserLevelResultMap">
+	select u.ulname,u.ulintegration,u.ulinfo from user_level u where u.ulid = #{ulid}
+	</select>
+	
+	
+</mapper>

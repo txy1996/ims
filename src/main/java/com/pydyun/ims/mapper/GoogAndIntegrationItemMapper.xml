@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.GoogAndIntegrationItemDao">
+	<resultMap id="BaseResultMap" type="GoogAndIntegrationItem">
+		<id column="id" property="id" />
+		<result column="iname" property="iname" />
+		<result column="inum" property="inum" />
+		<result column="igori" property="igori" />
+	</resultMap>
+	<!--根据积分和金币分类id查询 条件查询 -->
+	<select id="select" resultMap="BaseResultMap">
+		SELECT
+		gii.`id`,gii.`iname`,gii.`inum`,gii.`igori`
+		FROM
+		goog_integration_item
+		gii
+		<where>
+			<if test="iname !=null">
+				gii.`iname` like concat('%',concat(#{iname},'%'))
+			</if>
+			<if test=" igori!=null">
+				and gii.`igori`=#{igori}
+			</if>
+		</where>
+	</select>
+	<!--修改积分金币操作项 -->
+	<update id="updateGoogAndIntegrationItem"
+		parameterType="GoogAndIntegrationItem">
+		UPDATE goog_integration_item
+		<set>
+			<if test="iname != null">iname=#{iname},</if>
+			<if test="inum != null">inum=#{inum},</if>
+			<if test="igori != null">igori=#{igori}</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	<!--根据id删除积分金币操作项 -->
+	<delete id="deleteById" parameterType="Integer">
+		DELETE FROM
+		goog_integration_item
+		WHERE id = #{id}
+	</delete>
+	<!--新增积分金币操作项 -->
+	<insert id="addGoogAndIntegrationItem"
+		parameterType="GoogAndIntegrationItem">
+		INSERT INTO
+		goog_integration_item(iname,inum,igori)
+		VALUES(#{iname},#{inum},#{igori})
+	</insert>
+
+
+
+
+</mapper>

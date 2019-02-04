@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxSchemeDao" >
+	<resultMap id = "SetResultMap" type = "WxScheme" >
+		<id column = "sid" property = "sid" />
+		<result column = "scid" property = "scid" />
+		<result column = "urid" property = "urid" />
+		<result column = "sname" property = "sname" />
+		<result column = "sinfo" property = "sinfo" />
+		<result column = "spraise" property = "spraise" />
+		<result column = "soppose" property = "soppose" />
+		<result column = "sstate" property = "sstate" />
+		<result column = "sdate" property = "sdate" />
+		<result column = "spnum" property = "spnum" />
+		<result column = "sduration" property = "sduration" />
+		<result column = "srange" property = "srange" />
+		<result column = "simg" property = "simg" />
+		<association property = "wxSchemeClass" javaType = "WxSchemeClass" >
+			<id column = "scid" property = "scid" />
+			<result property = "scscid" column = "scscid" />
+			<result property = "scname" column = "scname" />
+			<result property = "scinfo" column = "scinfo" />
+		</association >
+		</resultMap >
+		<select id = "scheme" resultMap = "SetResultMap" >
+	select s.sid,s.sname,s.sinfo,s.soppose,s.spraise,s.spnum,s.sduration,s2.sname as shopsname,s2.slogo from scheme s inner join 
+ (select scid from scheme_class where scid = 6)  sc on sc.scid = s.scid  INNER JOIN scheme_stage ss on s.sid = ss.sid 
+INNER JOIN s_s_shop s1 on ss.ssid = s1.ssid INNER JOIN shop s2 on s1.shopid = s2.sid limit 0,3
+    </select >
+		<select id = "findtrain" resultType = "WxScheme" >
+			SELECT a.* FROM scheme a INNER JOIN 
+			(SELECT scid FROM scheme_class WHERE scname=#{task}) b ON
+				a.`scid`=b.scid 
+			<if test = "spnum !=null" >
+				AND a.spnum &lt;= #{spnum} 
+			</if >
+			<if test = "sduration !=null" >
+				AND a.sduration &lt;= #{sduration} 				
+			</if >
+			<if test = "srange !=null" >
+				AND a.srange = #{srange} 
+			</if >
+			AND a.`sstate`=2
+		</select >
+		
+	<resultMap id = "WxSchemeResponseMap" type = "WxSchemeResponse" >
+		<result column = "sid" property = "sid" />
+		<result column = "scname" property = "scname" />
+		<result column = "scid" property = "scid" />
+		<result column = "username" property = "username" />
+		<result column = "urid" property = "urid" />
+		<result column = "sname" property = "sname" />
+		<result column = "sinfo" property = "sinfo" />
+		<result column = "spraise" property = "spraise" />
+		<result column = "soppose" property = "soppose" />
+		<result column = "sstate" property = "sstate" />
+		<result column = "sdate" property = "sdate" />
+		<result column = "spnum" property = "spnum" />
+		<result column = "sduration" property = "sduration" />
+		<result column = "srange" property = "srange" />
+		<result column = "sprice" property = "sprice" />
+		<result column = "simg" property = "simg" />
+	</resultMap >
+	<!--查询所有方案**微信方案列表-->
+	<select id = "findWxSchemeAll" resultMap = "WxSchemeResponseMap" >
+		select se.`sid`,se.`scid`,scl.`scname`,se.`urid`,se.`sname`,se.`sinfo`,
+		se.`spraise`,se.`soppose`,se.`sstate`,se.`sdate`,se.`spnum`,
+		se.`sduration`,se.`srange`,se.`sprice`,se.`simg`
+		from `scheme` se
+		left join `scheme_class` scl on scl.`scid`=se.`scid`
+		<where >
+			<if test="scid !=null ">
+				AND se.`scid`=#{scid}
+			</if>
+			<if test="spnum !=null and spnum !=''">
+			  AND se.`spnum`=#{spnum}
+			</if>
+			<if test="sduration !=null and sduration !=''">
+				AND se.`sduration`=#{sduration}
+			</if>
+			<if test="srange !=null and srange !=''">
+				AND se.`srange`=#{srange}
+			</if>
+		</where >
+		order by se.`sid` desc
+	</select >
+    <select id="fscheme" resultMap="WxSchemeResponseMap">
+    select sid,sname,spnum,sduration,srange,Simg from scheme where sid in (${_parameter})
+    </select>
+</mapper >

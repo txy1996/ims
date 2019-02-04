@@ -1,0 +1,114 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxProductDao">
+	<resultMap id="SetResultMap" type="WxProduct">
+		<id column="id" property="id" />
+		<result column="pname" property="pname" />
+		<result column="cid" property="cid" />
+		<result column="sid" property="sid" />
+		<result column="spunum" property="spunum" />
+		<result column="stock" property="stock" />
+		<result column="pcode" property="pcode" />
+		<result column="property" property="property" />
+		<result column="price" property="price" />
+		<result column="yprice" property="yprice" />
+		<result column="info" property="info" />
+		<result column="state" property="Stase" />
+		<result column="ptitle" property="ptitle" />
+		<result column="psad" property="psad" />
+		<association property="proimg" javaType="WxProductimg">
+			<id column="id" property="id" />
+			<result column="pid" property="pid" />
+			<result column="url" property="url" />
+			<result column="tfimg" property="tfimg" />
+			<result column="name" property="name" />
+			<result column="updata" property="updata" />
+		</association>
+	</resultMap>
+
+	<select id="findbyids" resultType="WxProduct"
+		parameterType="String">
+		SELECT * FROM product WHERE id IN(${ids})
+	</select>
+
+	<select id="findlike" resultType="WxProduct">
+		SELECT pname,yprice FROM product WHERE pname LIKE '%${pname}%' AND <![CDATA[ id != #{id} ]]>
+	</select>
+
+    <select id="selectproduct" parameterType="Integer" resultMap="SetResultMap">
+    select p.id,p.cid,p.pname,p.price,p.yprice,pro.url from product p INNER JOIN productimg pro on p.id = pro.pid where p.sid = #{sid}
+    </select>
+
+	<select id="findbypid" resultMap="SetResultMap"
+		parameterType="String">
+		SELECT b.`url`,
+		a.`pname`,a.`id`,a.cid,a.sid,a.`spunum`,a.`property`,a.price,a.yprice,a.info,a.psad
+		FROM product a
+		INNER JOIN productimg b ON a.`id`=b.`pid` AND b.tfimg=0
+		AND a.`id`=#{pid}
+	</select>
+
+	<select id="findtj" parameterType="String"
+		resultMap="SetResultMap">
+		SELECT b.`url`,
+		a.`pname`,a.`id`,a.`spunum`,a.`property`,a.price,a.yprice,a.info,a.psad
+		FROM product a
+		INNER JOIN productimg b ON a.`id`=b.`pid` AND b.tfimg=0
+		AND a.`cid`=#{cid} AND <![CDATA[ a.id != #{pid} ]]>
+		<!-- LIKE '%${property}%'
+		AND <![CDATA[ a.id != #{pid} ]]> -->
+		limit 0,3
+	</select>
+
+	<select id="findid" parameterType="String" resultType="String">
+		SELECT id
+		FROM product WHERE cid=#{cid} LIMIT 1
+	</select>
+
+
+	<resultMap id="WxOrderProductMap" type="WxOrderProduct">
+		<result column="id" property="id" />
+		<result column="sid" property="sid" />
+		<result column="yprice" property="yprice" />
+		<result column="price" property="price" />
+		<result column="state" property="state" />
+		<result column="pxd" property="pxd" />
+		<result column="freight" property="freight" />
+		<result column="fg_xf" property="fgxf" />
+		<result column="fg_type" property="fgtype" />
+	</resultMap>
+	<select id="findPrdouctList" parameterType="java.util.List" resultMap="WxOrderProductMap">
+		SELECT
+		pt.`id`,pt.`sid`,pt.`price`,pt.`yprice`,pt.`state`,pt.`pxd`,pt.`freight`,pt.`fg_xf`,
+		pt.`fg_type`
+		FROM `product` pt
+		WHERE id in
+		<foreach collection="ids" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="findproid" parameterType="Integer" resultType="Integer">
+		SELECT cid FROM product WHERE id=#{id}
+	</select>
+	
+	<select id="findProductByIds" parameterType="java.util.List" resultMap="SetResultMap">
+	SELECT pt.id ,pt.`pname`,pt.`price`,pt.`yprice`,pt.`info`,pt.`property`
+	FROM `product` pt
+	WHERE pt.`id`IN
+	  <foreach collection = "list" item = "id" open = "(" close = ")"
+	           separator = "," >
+            #{id}
+        </foreach >
+	</select>
+	<select id="findbyids1" parameterType="java.util.List" resultMap="SetResultMap">
+	SELECT pro.id,pro.pname,proimg.url FROM product pro,productimg proimg WHERE pro.id=proimg.pid 
+	AND pro.id IN
+	  <foreach collection = "list" item = "id" open = "(" close = ")"
+	           separator = "," >
+            #{id}
+        </foreach >
+	</select>
+	
+
+</mapper>

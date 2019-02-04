@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.ImagesDao">
+	<resultMap id="SetResultMap" type="Images">
+		<result column="iid" property="iid" />
+		<result column="aid" property="aid" />
+		<result column="iname" property="iname" />
+		<result column="iurl" property="iurl" />
+		<result column="iimgurl" property="iimgurl" />
+		<result column="idate" property="idate" />
+    <association property="shop" javaType="Shop">
+    <result column="sid" property="sid" />
+    </association>
+	</resultMap>
+	<select id="selectshop" parameterType="int" resultMap="SetResultMap">
+		 select i.iid,i.aid,i.iname,i.iurl,i.iimgurl,i.idate,s.sid from images i INNER JOIN album a on i.aid =a.aid INNER JOIN shop s on a.sid = s.sid 
+		where  a.aid = #{aid} 
+		<!-- select iid,aid,iname,iurl,iimgurl,idate from images   where aid = #{aid} -->
+	</select>
+	<select id="getiid" parameterType="int" resultType="Images">
+	select * from images where iid = #{iid}
+	</select>
+	<delete id="delete" parameterType="int">
+		delete from images where
+		iid = #{iid}
+	</delete>
+	<insert id="cre" parameterType="Images" useGeneratedKeys="true"
+		keyProperty="iid">
+		insert into images 
+		(iid,aid,iname,iurl,iimgurl,idate)
+		values
+		(#{iid},#{aid},#{iname},#{iurl},#{iimgurl},#{idate})
+	</insert>
+	<update id = "updateimages" parameterType="Images">
+	  update images
+	  <set>
+			<if test="aid != null">aid=#{aid},</if>
+			<if test="iname != null">iname=#{iname},</if>
+			<if test="iurl != null">iurl=#{iurl},</if>
+			<if test="iimgurl != null">iimgurl=#{iimgurl},</if>
+			<if test="idate != null">idate=#{idate},</if>
+	 </set>
+			where iid = #{iid}
+	</update>
+</mapper>

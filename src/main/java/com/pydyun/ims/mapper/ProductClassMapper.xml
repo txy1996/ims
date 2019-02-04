@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.ProductClassDao">
+	<resultMap id="BaseResultMap" type="ProductClass">
+		<id column="id" property="id" />
+		<result column="text" property="text" />
+		<result column="cid" property="cid" />
+		<result column="templet_list" property="templet_list" />
+		<result column="templet_product" property="templet_product" />
+		
+	</resultMap>
+	
+	<select id="getProductClass" resultType="ProductClass">
+		SELECT id,cname as text ,cid FROM productclass order by product(id) asc
+	</select>
+
+	<insert id="addClass" parameterType="ProductClass" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into productclass (id,cname,cid,templet_list,templet_product)
+		values(#{id},#{text},#{cid},#{templet_list},#{templet_product})
+	</insert>
+	
+	<select id="selectbyid" parameterType="int" resultType="string">
+		select cname from productclass where id=#{id}
+	</select>
+	
+	<delete id="deleteByid" parameterType="int">
+		delete from productclass where
+		id = #{id}
+	</delete>
+	
+	<select id="findcid" parameterType="int" resultType="ProductClass">
+		select * from productclass where cid=#{cid}
+	</select>
+	
+	<select id="findproclass" parameterType="Integer" resultType="ProductClass">
+		SELECT id,cname,cid,templet_list,templet_product FROM productclass WHERE id=#{id}
+	</select>
+	
+	<select id="finds" resultType="ProductClass">
+		SELECT id,cname as text,cid FROM productclass WHERE cid IS NOT NULL
+	</select>
+	
+	<select id="findccname" resultType="String">
+		SELECT cname as text FROM `productclass` WHERE id=#{id}
+	</select>
+	
+	<select id="findmodel" resultType="Integer" parameterType="Integer">
+		SELECT templet_list FROM productclass WHERE id=#{id}
+	</select>
+	
+	<select id="finds1" resultType="ProductClass">
+		SELECT id,cname as text,cid FROM productclass WHERE templet_list=6 AND cid IS  NULL
+	</select>
+	
+	<select id="findtemplet" resultMap="BaseResultMap">
+		SELECT templet_list,templet_product FROM productclass  WHERE templet_list IS NOT NULL 
+		GROUP BY templet_list
+	</select>
+	
+</mapper>

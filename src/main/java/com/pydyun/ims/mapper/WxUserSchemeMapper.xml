@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxUserSchemeDao" >
+
+	<resultMap id = "WxUserSchemeMap" type = "WxUserScheme" >
+		<result column = "usid" property = "usid" />
+		<result column = "usuid" property = "usuid" />
+		<result column = "ussid" property = "ussid" />
+		<result column = "usscid" property = "usscid" />
+		<result column = "ustitle" property = "ustitle" />
+		<result column = "usinfo" property = "usinfo" />
+		<result column = "uspnum" property = "uspnum" />
+		<result column = "usduration" property = "usduration" />
+		<result column = "usrange" property = "usrange" />
+		<result column = "usjson" property = "usjson" />
+		<result column = "usdate" property = "usdate" />
+	</resultMap >
+	
+	
+	<!--微信:新增用户个人方案 -->
+	<insert id = "saveWxUserScheme" parameterType = "WxUserScheme" >
+		<selectKey resultType = "int" order = "AFTER" keyProperty = "usid" >
+			SELECT LAST_INSERT_ID()
+		</selectKey >
+		insert into user_scheme
+		(usuid,ussid,usscid,ustitle,usinfo,usjson,usdate,uspnum,usduration,usrange,usprice,usimg)
+		values(#{usuid},#{ussid},#{usscid},#{ustitle},#{usinfo},#{usjson},
+		CURRENT_TIMESTAMP,#{uspnum},#{usduration},#{usrange},#{usprice},#{usimg})
+	</insert >
+
+
+
+	<resultMap id = "WxUserSchemerListResponseMap"
+	           type = "WxUserSchemerListResponse" >
+		<result column = "usid" property = "usid" />
+		<result column = "username" property = "username" />
+		<result column = "superiorscname" property = "superiorscname" />
+		<result column = "scname" property = "scname" />
+		<result column = "ustitle" property = "ustitle" />
+		<result column = "usinfo" property = "usinfo" />
+		<result column = "usdate" property = "usdate" />
+		<result column = "uspnum" property = "uspnum" />
+		<result column = "usduration" property = "usduration" />
+		<result column = "usrange" property = "usrange" />
+		<result column = "sid" property = "sid" />
+	</resultMap >
+	<!--微信:查询用户自定义方案 -->
+	<select id = "findWxUserScheme" parameterType = "WxUserScheme"
+	        resultMap = "WxUserSchemerListResponseMap" >
+		SELECT
+			us.`usid`,
+			su.`username`,
+			sch.`scname` AS
+				superiorscname,
+			sc.`scname`,
+			us.`ustitle`,
+			us.`usdate`,
+			us.`usinfo`,
+			us.`usimg`,
+			us.`usprice`,
+			us.`uspnum`,
+			us.`usduration`,
+			us.`usrange`,
+			us.ussid AS sid
+		FROM
+			`user_scheme` us
+			LEFT JOIN `sys_user` su ON su.id = us.`usuid`
+			LEFT JOIN
+			`scheme_class` sc ON sc.`scid` = us.`usscid`
+			LEFT JOIN `scheme_class` sch
+				ON sc.`scscid` = sch.`scid`
+		WHERE us.`usuid` = #{usuid}
+		ORDER BY us.`usid`
+		DESC
+	</select >
+	<!--根据id查询用户自定义方案详情 -->
+	<select id = "getWxUserScheme" parameterType = "int"
+	        resultType = "WxUserScheme" >
+		SELECT
+			us.`usid`,
+			us.`usuid`,
+			us.`usscid`,
+			scl.`scname`,
+			us.`ussid`,
+			us.`ustitle`,
+			us.`usinfo`,
+			us.`usjson`,
+			us.`usdate`,
+			us.`uspnum`,
+			us.`usduration`,
+			us.`usrange`,
+			us.`usprice`,
+			us.`usimg`
+		FROM `user_scheme` us
+			LEFT JOIN `scheme_class` scl ON scl.`scid` = us.`usscid`
+		WHERE us.`usid` = #{usid}
+	</select >
+	
+	<select id = "getWxUserSchemePresence" parameterType = "int"
+	        resultType = "int" >
+		SELECT us.`usid`
+		FROM `user_scheme` us
+		WHERE
+			us.`usuid` = #{usuid}
+			AND
+			us.`ussid` = #{ussid}
+		limit 1
+	</select >
+	
+	
+	<!--微信:删除用户自定义方案 -->
+	<delete id = "deleteWxUserScheme" parameterType = "int" >
+		DELETE FROM
+			`user_scheme`
+		WHERE usuid = #{usuid} AND ussid = #{ussid}
+	</delete >
+	<!-- 微信:修改用户自定义方案 -->
+	<update id = "updateWxUserScheme" parameterType = "WxUserScheme" >
+		UPDATE user_scheme
+		<set >
+			<if test = "ustitle != null" >ustitle=#{ustitle},</if >
+			<if test = "usinfo != null" >usinfo=#{usinfo},</if >
+			<if test = "uspnum != null" >uspnum=#{uspnum},</if >
+			<if test = "usduration != null" >usduration=#{usduration},</if >
+			<if test = "usrange != null" >usrange=#{usrange},</if >
+			<if test = "usjson != null" >usjson=#{usjson},</if >
+		</set >
+		usdate=CURRENT_TIMESTAMP
+		WHERE usid =#{usid}
+	</update >
+</mapper >

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxIntentorderDao">
+	<resultMap id="IntentorderMap" type="WxIntentorder">
+		<result column="id" property="id" />
+		<result column="scid" property="scid" />
+		<result column="treat" property="treat" />
+		<result column="choise" property="choise" />
+		<result column="timechoise" property="timechoise" />
+		<result column="naturechoise" property="naturechoise" />
+		<result column="needchoise" property="needchoise" />
+		<result column="playchoise" property="playchoise" />
+		<result column="whistchoise" property="whistchoise" />
+		<result column="state" property="state" />
+		<result column="starttime" property="starttime" />
+		<result column="tel" property="tel" />
+		<result column="name" property="name" />
+		<result column="remarks" property="remarks" />
+		<result column="firstPerson" property="firstPerson" />
+		<result column="urid" property="urid" />
+	</resultMap>
+	
+	<insert id="insertIntentionOrder" parameterType="WxIntentorder">
+		insert into `intentorder`
+		(scid,treat,choise,timechoise,naturechoise,needchoise,state,starttime,tel,name,remarks,firstPerson,urid)
+		values(#{scid},#{treat},#{choise},#{timechoise},#{naturechoise},#{needchoise},#{state},#{starttime},#{tel},#{name},#{remarks},#{firstPerson},#{urid})
+	</insert>
+	
+	<select id="queryCustomization" parameterType="Integer" resultType="WxIntentorder">
+		SELECT id,scid,choise,timechoise,naturechoise,needchoise,state,starttime,tel,NAME,remarks,firstPerson,treat,urid 
+		FROM intentorder WHERE urid = #{urid} ORDER BY state,id DESC
+	</select>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.LabelDao">
+	<resultMap id="SetResultMap" type="Label">
+		<id column="lid" property="lid" />
+		<result column="lcid" property="lcid" />
+		<result column="urid" property="urid" />
+		<result column="lcinfo" property="lcinfo" />
+		<result column="lcdate" property="lcdate" />
+		<!-- <result column="fanum" property="fanum" />
+		<result column="jdnum" property="jdnum" />
+		<result column="shnum" property="shnum" />
+		<result column="yhnum" property="yhnum" />
+		<result column="cjren" property="cjren" /> -->
+		<association property="labelclass" javaType="Label_class">
+			<id column="lcid" property="lcid" />
+			<result column="lclcid" property="lclcid" />
+			<result column="lcname" property="text" />
+		</association>
+
+	</resultMap>
+	<select id="select" resultMap="SetResultMap">
+		SELECT la.lid,la.`urid`,la.lcid,lc.lcname,la.lcinfo,la.lcdate
+		FROM label la
+		LEFT JOIN label_class lc
+		ON la.lcid = lc.lcid
+		<where>			
+		<if test="lcid !=null">
+			and la.lcid=#{lcid}
+		</if>
+		<if test="urid !=null">
+			and la.urid=#{urid}
+		</if>		
+		</where>
+
+		ORDER BY la.lid asc
+	</select>
+
+	<!-- 修改为可以查询某一子级 -->
+	<select id="list" parameterType="int" resultMap="SetResultMap">
+		select l.lcid,l.lcname,l.lclcid from label_class l
+		<if test="lclcid != null and lclcid>=0">
+			where lclcid=#{lclcid}
+		</if>
+	</select>
+
+	<delete id="delete" parameterType="int">
+		delete label from label where
+		lid = #{lid}
+		<if test="urid !=null">
+			and urid=#{urid}
+		</if>
+	</delete>
+
+	<!-- 查询具体某一个分类的标签 -->
+	<select id="getLabel" resultMap="SetResultMap">
+		select l1.lid,l2.lcid,
+		l2.lcname,l1.lcinfo,l1.lcdate from label l1 INNER JOIN label_class l2
+		on l1.lcid = l2.lcid where l1.lid = #{lid}
+	</select>
+	<insert id="add" parameterType="Label" useGeneratedKeys="true"
+		keyProperty="lid">
+		insert into label (lid,urid,lcid,lcinfo,lcdate) values
+		(#{lid},#{urid},#{lcid},#{lcinfo},#{lcdate})
+	</insert>
+	<update id="update" parameterType="Label">
+		update label set lcid=#{lcid},lcinfo=#{lcinfo} where lid=#{lid}
+		<!-- <set>
+			<if test="urid != null">urid=#{urid},</if>
+			<if test="lcid != null">lcid=#{lcid},</if>
+			<if test="lcinfo != null">lcinfo=#{lcinfo},</if>
+			<if test="lcdate != null">lcdate=#{lcdate},</if>
+		</set>
+		where lid = #{lid} -->
+	</update>
+	
+	<select id="findid" parameterType="string" resultType="int">
+		select lid from label where lcinfo=#{lcinfo}
+	</select>
+	
+	<select id="getLabel1" resultMap="SetResultMap">
+		SELECT * FROM label WHERE lid=#{lid}
+	</select>
+</mapper>

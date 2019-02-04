@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxAssessImageDao" >
+
+	<resultMap id = "WxAssessImageMap" type = "WxAssessImage" >
+		<result column = "iid" property = "iid" />
+		<result column = "plid" property = "plid" />
+		<result column = "iurl" property = "iurl" />
+		<result column = "idate" property = "idate" />
+		<result column = "tfimg" property = "tfimg" />
+	</resultMap >
+	
+	<!--新增评论下图片 -->
+	<insert id = "saveWxAssessImage" parameterType = "java.util.List"
+	        useGeneratedKeys = "true" keyProperty = "iid" >
+		INSERT into
+		images_pl(plid,iurl,idate,tfimg)
+		VALUES
+		<foreach collection = "list" item = "Image" index = "index"
+		         separator = "," >
+			(#{Image.plid},#{Image.iurl},CURRENT_TIMESTAMP,
+			#{Image.tfimg})
+		</foreach >
+	</insert >
+	
+	<!--微信:根据评论id删除图片-->
+	<delete id = "deleteWxAssessImage" >
+		DELETE FROM
+		images_pl
+		WHERE plid =#{plid}
+	</delete >
+	
+	<!--根据评论id查询图片-->
+	<select id = "selectWxAssessImage" resultMap = "WxAssessImageMap" >
+		SELECT pl.`iid`,pl.`plid`,pl.`iurl`,pl.`idate`,pl.`tfimg`
+		FROM `images_pl` pl
+		WHERE pl.`plid`=#{plid}
+	</select >
+	<!--根据评论id批量查询图片-->
+	<select id = "findWxAssessImages" resultMap = "WxAssessImageMap" >
+		SELECT pl.`iid`,pl.`plid`,pl.`iurl`,pl.`idate`,pl.`tfimg`
+		FROM `images_pl` pl
+		WHERE pl.`plid`IN
+		<foreach collection = "ids" item = "plid" open = "(" close = ")" separator = "," >
+			#{plid}
+		</foreach >
+		ORDER BY pl.iid DESC
+	</select >
+
+
+
+
+</mapper >

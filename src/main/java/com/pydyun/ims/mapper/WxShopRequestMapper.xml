@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxShopRequestDao">
+	<resultMap id="SetResultMap" type="WxShopRequest">
+		<result column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="bid" property="bid" />
+		<result column="scid" property="scid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		<result column="slogo" property="slogo" />
+		<result column="styleimg" property="styleimg" />
+		<association property="wxlabel" javaType="WxLabel">
+			<id column="lcid" property="lcid" />
+			<result column="lid" property="lid" />
+			<result column="urid" property="urid" />
+			<result column="lcinfo" property="lcinfo" />
+			<result column="lcdate" property="lcdate" />
+		</association>
+		<association property="label_shop_sum" javaType="Label_shop_sum">
+			<id column="sid" property="sid" />
+			<result column="lssid" property="lssid" />
+			<result column="lid" property="lid" />
+			<result column="lsnum" property="lsnum" />
+		</association>
+	</resultMap>
+	<select id="hotpot" resultMap="SetResultMap">
+	select s.sid,s.scid,s.sname,s.sinfo,l.lcinfo,s.slogo from shop s,label l,label_shop_sum la where
+		s.sid = la.sid and la.lid = l.lid and sname like '%火锅%' limit 0,3 
+	</select>
+	<select id="Chinesefood" resultMap="SetResultMap">
+	select s.sid,s.scid,s.sname,s.sinfo,l.lcinfo,s.slogo from shop s,label l,label_shop_sum la where
+		s.sid = la.sid and la.lid = l.lid and sname like '%中餐%' limit 0,3
+	</select>
+	<select id="Westernstyle" resultMap="SetResultMap">
+	select s.sid,s.scid,s.sname,s.sinfo,l.lcinfo,s.slogo from shop s,label l,label_shop_sum la where
+		s.sid = la.sid and la.lid = l.lid and sname like '%西餐%' limit 0,3 
+	</select>
+	<select id="activity" resultMap="SetResultMap">
+	select s.sid,s.scid,s.sname,s.sinfo,l.lcinfo,s.slogo from shop s,label l,label_shop_sum la where
+		s.sid = la.sid and la.lid = l.lid and sname like '%KTV%' or sname like '%酒吧%'  limit 0,3 
+	</select>
+	<select id="shoplist" parameterType="Integer" resultMap="SetResultMap">
+	select s.sid,s.scid,s.sname,s.sinfo,l.lcinfo,s.slogo from shop s,label l,label_shop_sum la where
+		s.sid = la.sid and la.lid = l.lid and s.scid = #{id} 
+	
+	</select>
+</mapper>

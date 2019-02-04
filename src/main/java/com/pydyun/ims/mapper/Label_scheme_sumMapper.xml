@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.Label_scheme_sumDao">
+
+	<!-- 修改方案、方案所属阶段。被用户选择的标签记录表 -->
+	<update id="updateLabelscheme" parameterType="Label_scheme_sum">
+		update
+		label_scheme_sum set
+		sid = #{sid}
+		lid = #{lid}
+		lsnum = #{lsnum}
+		lstype =
+		#{lstype}
+		where lssid = #{lssid}
+	</update>
+
+	<!--新增方案、方案所属阶段。被用户选择的标签记录表 -->
+	<insert id="addLabelscheme" parameterType="Label_scheme_sum"
+		useGeneratedKeys="true" keyProperty="lssid">
+		insert into label_scheme_sum
+		(sid,lid,lsnum,lstype)
+		values(#{sid},#{lid},#{lsnum},#{lstype})
+	</insert>
+
+	<!--批量新增方案、方案所属阶段。被用户选择的标签记录表 -->
+	<insert id="addLabelschemelist" parameterType="java.util.List"
+		useGeneratedKeys="true" keyProperty="lssid">
+		insert into label_scheme_sum
+		(sid,lid,lsnum,lstype)
+		values
+		<foreach collection="list" item="Labels" index="index"
+			separator=",">
+			(#{Labels.sid},#{Labels.lid},#{Labels.lsnum},#{Labels.lstype})
+		</foreach>
+	</insert>
+	<!--删除方案、方案所属阶段。被用户选择的标签记录表   -->
+	<delete id="deleteLabelschemeBySid" parameterType="Integer">
+		delete from label_scheme_sum
+		where sid=#{sid}
+		AND lstype=#{lstype}
+	</delete>
+	
+	<!--批量删除方案、方案所属阶段。被用户选择的标签记录表 -->
+	<delete id="deleteLabelscheme">
+		delete from
+		label_scheme_sum where sid=#{sid}
+		and lid in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="findfabyid" parameterType="int" resultType="int">
+		SELECT
+		SUM(a.lsnum) FROM label_scheme_sum a INNER JOIN label b ON
+		a.lid=b.`lid`
+		AND a.`lid`=#{lid} AND a.lstype=0
+	</select>
+
+	<select id="findjdbyid" parameterType="int" resultType="int">
+		SELECT
+		SUM(a.lsnum) FROM label_scheme_sum a INNER JOIN label b ON
+		a.lid=b.`lid`
+		AND a.`lid`=#{lid} AND a.lstype=1
+	</select>
+
+
+	<resultMap id="SetResultMap" type="Label_scheme_sumResponse">
+		<id column="lssid" property="lssid" />
+		<result column="sid" property="sid" />
+		<result column="lid" property="lid" />
+		<result column="lstype" property="lstype" />
+		<result column="lcinfo" property="lcinfo" />
+	</resultMap>
+	<!--根据方案id查询 -->
+	<select id="findBySid" parameterType="int"
+		resultMap="SetResultMap">
+		SELECT
+		lss.`lssid`,lss.`lid`,lss.`sid`,la.`lcinfo`
+		FROM
+		`label_scheme_sum` lss
+		LEFT JOIN `label` la ON lss.`lid`=la.`lid`
+		WHERE
+		lss.`sid`=#{sid}
+		AND lss.`lstype`=#{lstype}
+	</select>
+
+</mapper>

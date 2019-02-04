@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxSettingsDao">
+	<resultMap id="SetResultMap" type="WxSettings">
+		<result column="sysinfo" property="sysinfo" />
+		<result column="sysreadme" property="sysreadme" />
+		</resultMap>
+		
+	<!-- 查询用户协议、隐私说明 -->
+	<select id="sysreadme" resultMap="SetResultMap">
+	select sysinfo,sysreadme from settings where id = 2	
+	</select>
+</mapper>

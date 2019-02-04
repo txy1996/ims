@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxShopImagesDao">
+	<resultMap id="SetResultMap" type="WxShopImages">
+		<result column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="bid" property="bid" />
+		<result column="scid" property="scid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />
+		<result column="syear" property="syear" />
+		<result column="sstyle" property="sstyle" />
+		<result column="slevel" property="slevel" />
+		<result column="scompartmentnum" property="scompartmentnum" />
+		<result column="stcompartment" property="stcompartment" />
+		<result column="scompartmentinfo" property="scompartmentinfo" />
+		<result column="scompartmentmin" property="scompartmentmin" />
+		<result column="smax" property="smax" />
+		<result column="smeetingplace" property="smeetingplace" />
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssmeetingplacemin" property="ssmeetingplacemin" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		<association property="wxalbum" javaType="WxAlbum">
+			<id column="sid" property="sid" />
+			<result column="aid" property="aid" />
+			<result column="ssid" property="ssid" />
+			<result column="faid" property="faid" />
+			<result column="aname" property="aname" />
+			<result column="ainfo" property="ainfo" />
+			<result column="aimg" property="aimg" />
+			<result column="urid" property="urid" />
+			<result column="auid" property="auid" />
+			<result column="adate" property="adate" />
+		</association>
+		<collection property="wximages" ofType="WxImages">
+			<id column="aid" property="aid" />
+			<result column="iid" property="iid" />
+			<result column="iname" property="iname" />
+			<result column="iurl" property="iurl" />
+			<result column="iimgurl" property="iimgurl" />
+			<result column="idate" property="idate" />
+		</collection>
+	</resultMap>
+	
+	 <select id="type" parameterType="Integer" resultMap="SetResultMap">
+	select s.sname,s.saddress,s.sinfo,a.aimg,i.iurl from shop s inner join album a on s.sid = a.sid inner join images i on
+		   a.aid = i.aid where s.sid = #{sid}
+	</select> 
+</mapper>

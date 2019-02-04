@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.Goods_shopDao">
+	<resultMap id="SetResultMap" type="Goods_shop">
+		<id column="sid" property="sid" />
+		<result column="gid" property="gid" />
+		<result column="gnum" property="gnum" />
+		<result column="gonum" property="gonum" />
+		<result column="goinfo" property="goinfo" />
+		<result column="godate" property="godate" />
+		<association property="shop" javaType="Shop">
+			<id column="sid" property="sid" />
+			<result column="zid" property="zid" />
+			<result column="bid" property="bid" />
+			<result column="scid" property="scid" />
+			<result column="sname" property="sname" />
+			<result column="saddress" property="saddress" />
+			<result column="stel" property="stel" />
+			<result column="scoordinate" property="scoordinate" />
+			<result column="scommerce" property="scommerce" />
+			<result column="sstate" property="sstate" />
+			<result column="syear" property="syear" />
+			<result column="sstyle" property="sstyle" />
+			<result column="slevel" property="slevel" />
+			<result column="scompartmentnum" property="scompartmentnum" />
+			<result column="stcompartment" property="stcompartment" />
+			<result column="scompartmentinfo" property="scompartmentinfo" />
+			<result column="scompartmentmin" property="scompartmentmin" />
+			<result column="smax" property="smax" />
+			<result column="smeetingplace" property="smeetingplace" />
+			<result column="sad" property="sad" />
+			<result column="sinfo" property="sinfo" />
+			<result column="ssmeetingplacemin"
+				property="ssmeetingplacemin" />
+			<result column="ssort" property="ssort" />
+			<result column="sbalancetype" property="sbalancetype" />
+			<result column="sbwx" property="sbwx" />
+			<result column="sbzfb" property="sbzfb" />
+			<result column="sbyhk" property="sbyhk" />
+		</association>
+
+	</resultMap>
+
+	<select id="select" resultMap="SetResultMap">
+		select s.sname,g.gid,g.gnum,g.gonum,g.goinfo,g.godate FROM shop AS s
+		INNER JOIN goods_shop AS g ON s.sid = g.sid
+		<where>
+			<if test="sid !=null">
+				and s.sid =#{sid}
+			</if>
+			<if test="goinfo !=null">
+				and g.goinfo=#{goinfo}
+			</if>
+			<if test="starttime !=null and endtime !=null">
+				and g.godate BETWEEN concat(#{starttime}) AND concat(#{endtime})
+			</if>
+		</where>
+		order by g.`godate` desc
+	</select>
+
+	<!-- 查询指定店铺当前的积分 -->
+	<select id="seleteNum" resultType="int" parameterType="int">
+		select
+		GetShopGoodsNumByID(#{sid},0)
+	</select>
+	<!-- 为指定的店铺增加或者减少金币，并形成一条记录 -->
+	<insert id="addshop" parameterType="Goods_shop"
+		useGeneratedKeys="true" keyProperty="gid">
+		INSERT into goods_shop(sid,gnum,gonum,goinfo,godate)
+		VALUES(#{sid},GetShopGoodsNumByID(#{sid},#{gonum}),#{gonum},#{goinfo},CURRENT_TIMESTAMP)
+	</insert>
+
+	<delete id="delete" parameterType="int">
+		delete from goods_shop where gid = #{gid}
+	</delete>
+
+
+	<select id="shop" parameterType="String" resultType="Shop">
+		select s.sid,s.sname from shop s
+	</select>
+
+</mapper>

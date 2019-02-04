@@ -1,0 +1,17 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxLabel_shop_sumDao">
+<resultMap id="SetResultMap" type="Label_shop_sum">
+            <result column="sid" property="sid"/>
+            <result column="lssid" property="lssid"/>
+            <association property="wxlabel" javaType="WxLabel">
+             <id column="lcid" property="lcid"/>
+            <result column="lid" property="lid"/>
+            <result column="urid" property="urid"/>
+            <result column="lcinfo" property="lcinfo"/>
+            <result column="lcdate" property="lcdate"/>
+            </association>
+</resultMap>
+<select id="selectlabel" parameterType="Integer" resultMap="SetResultMap">
+select l.lcinfo from label l INNER JOIN label_shop_sum la on l.lid = la.lid where la.sid = #{sid}
+</select>
+</mapper>

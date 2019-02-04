@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.ShopDao">
+	<resultMap id="SetResultMap" type="Shop">
+		<id column="zid" property="zid" />
+		<result column="sid" property="sid" />
+		<result column="bid" property="bid" />
+		<result column="scid" property="scid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		<result column="number" property="number" />
+		<result column="slogo" property="slogo" />
+		<result column="styleimg" property="styleimg" />
+		<result column="stime" property="stime" />
+		<result column="sutime" property="sutime" />
+		<association property="zone" javaType="Zone">
+			<id column="zid" property="zid" />
+			<result column="zname" property="zname" />
+			<result column="z_zid" property="z_zid" />
+		</association>
+		<association property="sb" javaType="ShopBrand">
+			<id column="bid" property="bid" />
+			<result column="bname" property="bname" />
+			<result column="binfo" property="binfo" />
+		</association>
+		<association property="sc" javaType="ShopCation">
+			<id column="scid" property="scid" />
+			<result column="scscid" property="scscid" />
+			<result column="scname" property="scname" />
+			<result column="scinfo" property="scinfo" />
+		</association>
+	</resultMap>
+	<select id="shops" resultMap="SetResultMap">
+	select sid,sname,slogo from shop where sid in (${_parameter})
+	</select>
+	<delete id="deletesp" parameterType="Integer">
+	delete from shop where sid = #{id}
+	</delete>
+	<select id="selectshop" resultMap="SetResultMap">
+		SELECT
+		s.sid,b.bid,s.sname,z.zname,sc.scname,b.bname,s.stel,s.scommerce,s.sbalancetype,s.sstate
+		FROM shop AS s
+		INNER JOIN brand AS b ON s.bid = b.bid
+		INNER JOIN shopclass
+		AS sc ON s.scid = sc.scid
+		INNER JOIN zone AS z ON s.zid = z.zid and 1=1
+		<if test="scid !=null">
+		 and s.scid=#{scid}
+		</if>
+		<if test="bid !=null">
+		 and s.bid=#{bid}
+		</if>
+		<if test="sname !=null">
+		 and s.sname like '%${sname}%'
+		</if>
+		<if test="scommerce !=null">
+		 and s.scommerce like '%${scommerce}%'
+		</if>
+		order by
+		s.sid asc
+	</select>
+
+	<select id="findshop" resultMap="SetResultMap">
+		SELECT
+		s.sid,b.bid,s.sname,z.zname,sc.scname,b.bname,s.stel,s.sbalancetype,s.sstate
+		FROM shop AS s
+		LEFT JOIN brand AS b ON s.bid = b.bid
+		LEFT JOIN shopclass
+		AS sc ON s.scid = sc.scid
+		LEFT JOIN zone AS z ON s.zid = z.zid
+		order by
+		s.sid asc
+	</select>
+
+	<select id="getshopsta" resultMap="SetResultMap">
+		select
+		s.sid,s.zid,s.bid,s.scid,s.sname,s.saddress,s.stel,s.scoordinate,s.scommerce,s.sstate,
+		s.sad,s.sinfo,s.ssort,s.sbalancetype,s.sbwx,s.sbzfb,s.sbyhk,slogo,styleimg,z.zname
+		from shop s,
+		zone z where s.zid = z.zid and s.sid = #{sid}
+		order by
+		s.sid asc
+	</select>
+
+	<select id="findshop1" resultMap="SetResultMap"
+		parameterType="int">
+		SELECT
+		s.sid,b.bid,s.sname,z.zname,sc.scname,b.bname,s.stel,s.sbalancetype,s.sstate
+		FROM shop AS s
+		LEFT JOIN brand AS b ON s.bid = b.bid
+		LEFT JOIN shopclass
+		AS sc ON s.scid = sc.scid
+		LEFT JOIN zone AS z ON s.zid = z.zid
+		where
+		s.sid=#{sid}
+		order by s.sid asc
+	</select>
+
+
+	<select id="selectbid" parameterType="String"
+		resultType="string">
+		select b.bid,b.bname from shop s,brand b GROUP BY b.bid
+	</select>
+	<select id="getSname" parameterType="String" resultType="Shop">
+		select
+		sid,sname from shop
+	</select>
+	<select id="selectzid" parameterType="String" resultType="Zone">
+		select
+		z.zname,z.zid from zone z where z.zid &lt;90
+
+	</select>
+	<select id="getshop" parameterType="int" resultType="ShopSpare">
+		select s.*
+		,z.zname from shop s,zone z where s.sid = #{sid}
+		and s.zid = z.zid
+	</select>
+	<delete id="delete" parameterType="int">
+		delete from shop where
+		sid =
+		#{sid}
+	</delete>
+	<insert id="add" parameterType="Shop" useGeneratedKeys="true"
+		keyProperty="sid">
+		insert into shop
+		(sid,zid,bid,scid,sname,saddress,stel,scoordinate,scommerce,sstate,
+		sad,sinfo,ssort,sbalancetype,sbwx,sbzfb,sbyhk,slogo,styleimg,stime,sutime)
+		values
+		(#{sid},#{zid},#{bid},#{scid},#{sname},#{saddress},#{stel},#{scoordinate},#{scommerce},#{sstate},
+		#{sad},#{sinfo},#{ssort},#{sbalancetype},#{sbwx},#{sbzfb},#{sbyhk},#{slogo},#{styleimg},#{stime},#{sutime})
+	</insert>
+	<update id="updateshop" parameterType="Shop">
+		update shop
+		<set>
+			<if test="zid != null">zid=#{zid},</if>
+			<if test="bid != null">bid=#{bid},</if>
+			<if test="scid != null">scid=#{scid},</if>
+			<if test="sname != null">sname=#{sname},</if>
+			<if test="saddress != null">saddress=#{saddress},</if>
+			<if test="stel != null">stel=#{stel},</if>
+			<if test="scoordinate != null">scoordinate=#{scoordinate},</if>
+			<if test="scommerce != null">scommerce=#{scommerce},</if>
+			<if test="sstate != null">sstate=#{sstate},</if>
+			<if test="sad != null">sad=#{sad},</if>
+			<if test="sinfo != null">sinfo=#{sinfo},</if>
+			<if test="ssort != null">ssort=#{ssort},</if>
+			<if test="sbalancetype != null">sbalancetype=#{sbalancetype},</if>
+			<if test="sbwx != null">sbwx=#{sbwx},</if>
+			<if test="sbzfb != null">sbzfb=#{sbzfb},</if>
+			<if test="sbyhk != null">sbyhk=#{sbyhk},</if>
+			<if test="slogo != null">slogo=#{slogo},</if>
+			<if test="styleimg != null">styleimg=#{styleimg},</if>
+			<if test="sutime != null">sutime=#{sutime},</if>
+		</set>
+		where sid = #{sid}
+	</update>
+
+	<select id="selectby" resultMap="SetResultMap">
+		SELECT
+		s.sid,s.zid,s.bid,s.sname,z.zname,sc.scname,b.bname,s.stel,s.sbalancetype,s.sstate
+		FROM shop AS s
+		left JOIN brand AS b ON s.bid = b.bid
+		left JOIN shopclass
+		AS sc ON s.scid = sc.scid
+		left JOIN zone AS z ON s.zid = z.zid
+		where 1=1
+		<if test="scid!=null">
+			and s.scid=#{scid}
+		</if>
+		<if test="bid!=null">
+			and s.bid=#{bid}
+		</if>
+		<if test="sname!=null">
+			and s.sname like '%${sname}%'
+		</if>
+		<if test="stel!=null">
+			and s.stel like '%${stel}%'
+		</if>
+		ORDER BY
+		s.sid DESC
+
+	</select>
+
+	<select id="getbid" parameterType="int" resultType="int">
+		SELECT s.bid FROM shop s WHERE 1=1
+		<if test="scid!=null">
+			and s.scid=#{scid}
+		</if>
+	</select>
+	<!--方案阶段需要的模糊查询 -->
+	<select id="getByShopName" resultType="ShopResponse">
+		SELECT
+		sh.`sid`,sh.`sname`,sh.`sad`
+		FROM shop sh
+		WHERE sh.`sname` LIKE
+		'%${sname}%'
+		ORDER BY sh.`sname` DESC
+		LIMIT 0, 50;
+	</select>
+
+	<select id="getscid" parameterType="int" resultType="int">
+		SELECT s.scid FROM shop s WHERE 1=1
+		<if test="bid!=null">
+			and s.bid=#{bid}
+		</if>
+	</select>
+
+	<select id="getbid1" parameterType="int" resultType="int">
+		select bid
+		from shop where sid=#{sid}
+	</select>
+	
+	<select id="getsname" parameterType="int" resultType="String">
+	select sname from shop where sid=#{sid}
+	</select>
+
+	<select id="getByShopId" parameterType="int" resultType="Shop">
+		SELECT
+		sh.`sid`,sh.`sname`
+		FROM shop sh
+		WHERE sh.`sid`=#{sid}
+	</select>
+
+<update id="picture" parameterType="Shop">
+update shop
+		<set>
+			<if test="styleimg != null">styleimg=#{styleimg},</if>
+		</set>
+		where sid = #{sid}
+</update>
+
+<select id="Styleimg" parameterType="Integer" resultType="Shop">
+select styleimg from shop where sid = #{sid}
+</select>
+</mapper>

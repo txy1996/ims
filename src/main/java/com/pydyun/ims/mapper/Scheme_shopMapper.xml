@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.Scheme_shopDao">
+	<resultMap id="BaseResultMap" type="Scheme">
+		<id column="sid" property="sid" />
+		<result column="scid" property="scid" />
+		<result column="urid" property="urid" />
+		<result column="sname" property="sname" />
+		<result column="sinfo" property="sinfo" />
+		<result column="spraise" property="spraise" />
+		<result column="soppose" property="soppose" />
+		<result column="sstate" property="sstate" />
+		<result column="sdate" property="sdate" />
+		<association property="scheme_class"
+			javaType="Scheme_class">
+			<id column="scid" property="scid" />
+			<result property="scscid" column="scscid" />
+			<result property="scname" column="scname" />
+			<result property="scinfo" column="scinfo" />
+		</association>
+	</resultMap>
+	<resultMap id="SchemIoResultMap" type="SchemeIo">
+		<id column="sid" property="sid" />
+		<result column="scid" property="scid" />
+		<result column="urid" property="urid" />
+		<result column="sname" property="sname" />
+		<result column="sinfo" property="sinfo" />
+		<result column="spraise" property="spraise" />
+		<result column="soppose" property="soppose" />
+		<result column="sstate" property="sstate" />
+		<result column="sdate" property="sdate" />
+		<collection property="shop" ofType="Shop">
+			<id property="ssid" column="ssid" />
+			<result property="sid" column="sid" />
+			<result column="zid" property="zid" />
+			<result column="bid" property="bid" />
+			<result column="scid" property="scid" />
+			<result column="sname" property="sname" />
+			<result column="saddress" property="saddress" />
+			<result column="stel" property="stel" />
+			<result column="scoordinate" property="scoordinate" />
+			<result column="scommerce" property="scommerce" />
+			<result column="sstate" property="sstate" />
+			<result column="syear" property="syear" />
+			<result column="sstyle" property="sstyle" />
+			<result column="slevel" property="slevel" />
+			<result column="scompartmentnum" property="scompartmentnum" />
+			<result column="stcompartment" property="stcompartment" />
+			<result column="scompartmentinfo" property="scompartmentinfo" />
+			<result column="scompartmentmin" property="scompartmentmin" />
+			<result column="smax" property="smax" />
+			<result column="smeetingplace" property="smeetingplace" />
+			<result column="sad" property="sad" />
+			<result column="sinfo" property="sinfo" />
+			<result column="ssmeetingplacemin"
+				property="ssmeetingplacemin" />
+			<result column="ssort" property="ssort" />
+			<result column="sbalancetype" property="sbalancetype" />
+			<result column="sbwx" property="sbwx" />
+			<result column="sbzfb" property="sbzfb" />
+			<result column="sbyhk" property="sbyhk" />
+		</collection>
+		<collection property="scheme_stage" ofType="Scheme_stage">
+			<id column="ssid" property="ssid" />
+			<result column="scscid" property="scscid" />
+			<result column="scname" property="scname" />
+			<result column="scinfo" property="scinfo" />
+		</collection>
+	</resultMap>
+
+
+	<!-- 修改方案商家列表-->
+	<update id="updateSchemeShop" parameterType="Scheme_shop">
+		update s_s_shop
+		<set>
+			<if test="shopid != null">shopid = #{shopid},</if>
+			<if test="ssad != null">ssad = #{ssad},</if>
+			<if test="ssimgs != null">ssimgs = #{ssimgs},</if>
+			<if test="sreplace != null">sreplace = #{sreplace},</if>
+			<if test="shopid != null">shopid = #{shopid}</if>
+		</set>
+		where ssid = #{ssid}
+	</update>
+
+	<!--新增方案商家列表 -->
+	<insert id="addSchemeShop" parameterType="Scheme_shop"
+		useGeneratedKeys="true" keyProperty="sssid">
+		insert into s_s_shop
+		(shopid,ssid,ssort,ssad,ssimgs,sreplace)
+		values(#{shopid},#{ssid},#{ssort},#{ssad},#{ssimgs},#{sreplace})
+	</insert>
+	
+	<delete id="deleteSchemeShop" parameterType="Integer">
+		delete from s_s_shop
+		where ssid = #{ssid}
+	</delete>
+
+
+
+</mapper>

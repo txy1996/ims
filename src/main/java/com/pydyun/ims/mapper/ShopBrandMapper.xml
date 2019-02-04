@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.ShopBrandDao">
+<resultMap id="SetResultMap" type="ShopBrand" >
+    <result column="bid" property="bid"  />
+    <result column="bname" property="bname"  />
+    <result column="binfo" property="binfo"  />
+  
+  </resultMap>
+	<select id="selectshop" resultMap="SetResultMap">
+		 select * from brand
+	</select>
+<delete id="delete" parameterType="int">
+delete from brand where bid = #{bid}
+</delete>
+<select id="getshop" parameterType="int" resultMap="SetResultMap">
+select * from brand where bid = #{bid}
+</select>
+<update id = "updateshop" parameterType = "ShopBrand">
+update brand 
+<set>
+            <!-- <if test="bname != null">bid=#{bid},</if> -->
+            <if test="bname != null">bname=#{bname},</if>
+            <if test="binfo != null">binfo=#{binfo},</if>
+            </set>
+  where bid = #{bid} 
+</update>
+<insert id="add" parameterType="ShopBrand" useGeneratedKeys="true" keyProperty="bid">
+insert into brand (bid,bname,binfo) values(#{bid},#{bname},#{binfo})
+</insert>
+
+<select id="findname"  resultType="string">
+	select bname from brand
+	</select>
+	
+	<select id="selectshop1" resultMap="SetResultMap" parameterType="int">
+		 select * from brand where bid=#{bid}
+	</select>
+	
+	<select id="selectshop2" resultType="ShopBrand" parameterType="int">
+		 select * from brand where bid=#{bid}
+	</select>
+</mapper>

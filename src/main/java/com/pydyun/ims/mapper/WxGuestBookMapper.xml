@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxGuestBookDao" >
+
+    <resultMap id = "WxGuestBookMap" type = "WxGuestBook" >
+        <result column = "gbid" property = "gbid" />
+        <result column = "urid" property = "urid" />
+        <result column = "auid" property = "auid" />
+        <result column = "gbinfo" property = "gbinfo" />
+        <result column = "gbdate" property = "gbdate" />
+    </resultMap >
+	
+	<!--用户留言-->
+	<insert id = "saveWxGuestBook" parameterType = "WxGuestBook"
+	        useGeneratedKeys = "true" keyProperty = "gbid" >
+        INSERT into
+        guestbook(urid,auid,gbinfo,gbdate)
+        VALUES(#{urid},#{auid},#{gbinfo},CURRENT_TIMESTAMP)
+    </insert >
+	
+	<!--查询用户留言-->
+	<select id = "findWxGuestBookUserMessage" parameterType = "WxGuestBook" resultMap = "WxGuestBookMap" >
+        SELECT gb.`gbid`,gb.`urid`,gb.`auid`,gb.`gbinfo`,gb.`gbdate`
+        FROM `guestbook` gb
+        WHERE gb.urid=#{urid}
+    </select >
+	<!--查询系统回复留言-->
+	<select id = "findWxGuestBookSystemReply" parameterType = "WxGuestBook" resultMap = "WxGuestBookMap" >
+        SELECT gb.`gbid`,gb.`urid`,gb.`auid`,gb.`gbinfo`,gb.`gbdate`
+        FROM `guestbook` gb
+        WHERE gb.auid=#{gbid}
+
+
+    </select >
+
+    <select id = "findWxGuestBookByGbid" parameterType = "java.util.List" resultMap = "WxGuestBookMap" >
+        SELECT gb.`gbid`,gb.`urid`,gb.`auid`,gb.`gbinfo`,gb.`gbdate`
+        FROM `guestbook` gb
+        where gb.`gbid`IN
+        <foreach collection = "list" item = "gbid" open = "(" close = ")"
+                 separator = "," >
+            #{gbid}
+        </foreach >
+        or gb.`auid`IN
+        <foreach collection = "list" item = "gbid" open = "(" close = ")"
+                 separator = "," >
+            #{gbid}
+        </foreach >
+    </select >
+	
+	<!--批量:删除用户留言-->
+	<delete id = "deleteWxGuestBook" parameterType = "java.util.List" >
+        DELETE FROM
+        guestbook
+        WHERE gbid IN
+        <foreach collection = "list" item = "gbid" open = "(" close = ")"
+                 separator = "," >
+            #{gbid}
+        </foreach >
+    </delete >
+
+
+</mapper >

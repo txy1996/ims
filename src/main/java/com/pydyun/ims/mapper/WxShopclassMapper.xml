@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxShopclassDao">
+	<resultMap id="SetResultMap" type="WxShopclass">
+		<result column="scid" property="scid" />
+		<association property="wxshop" javaType="WxShop">
+		<id column="scid" property="scid" />
+		<result column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="bid" property="bid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		<result column="slogo" property="slogo" />
+		<result column="styleimg" property="styleimg" />
+		</association>
+	</resultMap>
+	<select id="restaurant" parameterType="Integer" resultMap="SetResultMap">
+	select s.sid, s.sname,s.saddress,s.stel,s.slogo from shop s ,(select scid from shopclass where scscid=#{id})  sh where  s.scid = sh.scid limit 0,3
+	</select>
+		<select id="listsang" parameterType="Integer" resultMap="SetResultMap">
+	select s.sid, s.sname,s.saddress,s.stel,s.slogo from shop s ,(select scid from shopclass where scscid=#{id1})  sh where  s.scid = sh.scid 
+  limit 0,3
+	</select>
+	<select id="listtravel" parameterType="Integer" resultMap="SetResultMap">
+	select s.sid, s.sname,s.saddress,s.stel,s.slogo from shop s ,(select scid from shopclass where scscid=#{id2})  sh where  s.scid = sh.scid 
+  limit 0,3
+	</select>
+</mapper>

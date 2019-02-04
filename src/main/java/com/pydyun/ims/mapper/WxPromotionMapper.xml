@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxPromotionDao">
+	<resultMap id="WxPromotion" type="WxPromotion">
+		<result column="id" property="id" />
+		<result column="ptype" property="ptype" />
+		<result column="pzone" property="pzone" />
+		<result column="psource" property="psource" />
+		<result column="pinfo" property="pinfo" />
+		<result column="sdate" property="sdate" />
+		<result column="odate" property="odate" />
+		<result column="state" property="state" />
+		<result column="pdate" property="pdate" />
+	</resultMap>
+	
+	<select id="activity"  resultType="WxPromotion">
+	select p.psource from (select current_timestamp as time) time ,promotion p where Date(sdate) <![CDATA[ <= ]]> Date(time) 
+and Date(odate) <![CDATA[ >= ]]> Date(time)
+	</select>
+	
+	<select id="Top" resultType="WxPromotion">
+	select psource from promotion where id = 1
+	</select>
+	<select id="Central" resultType="WxPromotion">
+	select psource from promotion where id = 2
+	</select>
+	<!-- <select id="bottom"  resultType="WxPromotion">
+	select psource from promotion where id = 3 or id = 4 or id = 5
+	</select> -->
+	<!-- 热门方案模块 -->
+	<select id="rschema"  resultType="WxPromotion">
+	select psource from promotion where id = 3 
+	</select>
+	<!-- 优质商家模块 -->
+	<select id="yshop"  resultType="WxPromotion">
+	select psource from promotion where id = 4 
+	</select>
+	<!-- 为你推荐模块 -->
+	<select id="bottom"  resultType="WxPromotion">
+	select psource from promotion where id = 5
+	</select>
+	<select id="findculture" resultType="WxPromotion">
+		SELECT psource FROM promotion WHERE id=100 OR id=101 OR id=102 OR id=103 OR id=104 OR id=105 OR id=106
+	</select>
+	<select id="training" resultType="WxPromotion">
+	select psource from promotion where id = 8
+	</select>
+	<select id="Labour" resultType="WxPromotion">
+	select psource from promotion where id = 6
+	</select>
+</mapper>

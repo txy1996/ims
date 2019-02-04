@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.MaileCodeDao">
+	<resultMap id="MaileCodeResult" type="MaileCode">
+		<result column="id" property="id" />
+		<result column="phone" property="phone" />
+		<result column="code" property="code" />
+		<result column="password" property="password" />
+	</resultMap>
+	
+	<insert id="creEmaileCode" parameterType="MaileCode" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into emailcode 
+		(phone,code,password)
+		values
+		(#{phone},#{code},#{password})
+	</insert>
+	<!-- 增加一个根据电话号码查询 -->
+	<select id="selectByPhone" parameterType="String" resultMap="MaileCodeResult">
+		SELECT * FROM emailcode where phone=#{phone}
+	</select>
+</mapper>

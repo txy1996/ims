@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxVoucherDao">
+	<resultMap id="WxVoucher" type="WxVoucher">
+		<result column="vmoney" property="vmoney" />
+		<result column="vprice" property="vprice" />
+		<result column="vsdate" property="vsdate" />
+		<result column="vodate" property="vodate" />
+		<result column="vtitle" property="vtitle" />
+		<result column="vinfo" property="vinfo" />
+		<result column="vimg" property="vimg" />
+	</resultMap>
+
+	<select id="selectv" parameterType="String"  resultType="WxVoucher">
+		select
+		v.vmoney,v.vodate,v.vsdate,v.vprice,v.vimg,v.vtitle,v.vinfo from voucher v 
+		where v.vrange = #{vrange}
+	</select>
+
+
+	<resultMap id="WxVoucherResponse" type="WxVoucherResponse">
+		<result column="vtitle" property="vtitle" />
+		<result column="vsdate" property="vsdate" />
+		<result column="vodate" property="vodate" />
+		<result column="vimg" property="vimg" />
+		<result column="vmoney" property="vmoney" />
+		<result column="vrange" property="vrange" />
+		<result column="uvlstate" property="uvlstate" />
+	</resultMap>
+	<!--微信查询有效的代金券 -->
+	<select id="findVoucherByUrid" resultMap="WxVoucherResponse">
+		SELECT
+		vo.`vtitle`,vo.`vimg`,vo.`vsdate`,vo.`vodate`,vo.`vmoney`,vo.`vrange`,
+		uv.`uvlstate`
+		FROM `u_v_log` uv
+		LEFT JOIN `voucher` vo ON
+		uv.`vid`=vo.`vid`
+		WHERE
+		uv.`urid`=#{urid}
+		AND uv.`uvlstate`=1
+		AND
+		uv.`uvlInvalid` IS NULL
+	</select>
+	
+	<select id="getVoucherCountByUrid" resultType="int">
+		SELECT count(uv.`uvlid`) as Voucher
+		FROM `u_v_log` uv
+		WHERE
+		uv.`urid`=#{urid}
+		AND uv.`uvlstate`=1
+		AND
+		uv.`uvlInvalid` IS NULL
+	</select>
+
+	<select id="findVoucherInvalidByUrid"
+		resultMap="WxVoucherResponse">
+		SELECT
+		vo.`vtitle`,vo.`vimg`,vo.`vsdate`,vo.`vodate`,vo.`vmoney`,vo.`vrange`,
+		uv.`uvlstate`
+		FROM `u_v_log` uv
+		LEFT JOIN `voucher` vo ON
+		uv.`vid`=vo.`vid`
+		WHERE
+		uv.`urid`=#{urid}
+		AND uv.`uvlstate` <![CDATA[ <> ]]>
+		1
+		AND
+		uv.`uvlInvalid` IS NOT NULL
+	</select>
+
+	<resultMap id="WxOrderProductMap" type="WxOrderProduct">
+		<result column="id" property="id" />
+		<result column="sid" property="sid" />
+		<result column="yprice" property="yprice" />
+		<result column="state" property="state" />
+		<result column="pxd" property="pxd" />
+		<result column="freight" property="freight" />
+		<result column="fg_xf" property="fgxf" />
+		<result column="fg_type" property="fgtype" />
+	</resultMap>
+	<select id="findVoucherByVid" parameterType="java.util.List"
+		resultMap="WxOrderProductMap">
+		SELECT vo.vid AS id,vo.vprice AS yprice
+		FROM `voucher` vo
+		WHERE vo.`vid`
+		in
+		<foreach collection="vids" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+
+
+
+
+
+</mapper>

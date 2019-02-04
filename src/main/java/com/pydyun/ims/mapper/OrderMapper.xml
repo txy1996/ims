@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.OrderDAO" >
+
+	<resultMap id = "OrderMap" type = "Order" >
+		<id column = "oid" property = "oid" />
+		<result column = "urid" property = "urid" />
+		<result column = "cid" property = "cid" />
+		<result column = "odate" property = "odate" />
+		<result column = "onum" property = "onum" />
+		<result column = "opaytype" property = "opaytype" />
+		<result column = "opaymodel" property = "opaymodel" />
+		<result column = "oispay" property = "oispay" />
+		<result column = "ogetintegration" property = "ogetintegration" />
+		<result column = "omoney" property = "omoney" />
+		<result column = "ogoods" property = "ogoods" />
+		<result column = "oisinvoice" property = "oisinvoice" />
+		<result column = "ostae" property = "ostae" />
+		<result column = "onoinfo" property = "onoinfo" />
+		<result column = "oshfs" property = "oshfs" />
+		<result column = "oshname" property = "oshname" />
+		<result column = "oshtel" property = "oshtel" />
+		<result column = "oshaddress" property = "oshaddress" />
+		<result column = "oexpress" property = "oexpress" />
+		<result column = "oexpresssn" property = "oexpresssn" />
+		<association property = "user" javaType = "User" >
+			<id property = "id" column = "id" />
+			<result property = "username" column = "username" />
+			<result property = "password" column = "password" />
+			<result property = "salt" column = "salt" />
+			<result property = "createTime" column = "create_time" />
+			<result property = "state" column = "state" />
+			<result property = "realName" column = "real_name" />
+			<result property = "gender" column = "gender" />
+			<result property = "nation" column = "nation" />
+			<result property = "birth" column = "birth" />
+			<result property = "urtname" column = "urtname" />
+			<result property = "urautograph" column = "urautograph" />
+			<result property = "mobile" column = "mobile" />
+			<result property = "email" column = "email" />
+			<result property = "department" column = "department" />
+			<result property = "position" column = "position" />
+			<result property = "note" column = "note" />
+			<result property = "head" column = "head" />
+			<result property = "activateTime" column = "activate_time" />
+			<result property = "code" column = "code" />
+		</association >
+		<association property = "company" javaType = "Company" >
+			<id column = "cid" property = "cid" />
+			<result column = "zid" property = "zid" />
+			<result column = "cname" property = "cname" />
+			<result column = "cgeneral_taxpayer" property = "cgeneral_taxpayer" />
+			<result column = "cidentify" property = "cidentify" />
+			<result column = "ccode" property = "ccode" />
+			<result column = "caddress" property = "caddress" />
+			<result column = "cbank" property = "cbank" />
+			<result column = "caccount" property = "caccount" />
+			<result column = "ctel" property = "ctel" />
+			<result column = "cinfo" property = "cinfo" />
+		</association >
+	</resultMap >
+	
+	<!-- 修改为联合查询，同时新增where条件为4个，新增排序为ID倒序，不太确定下面的排序语句放哪里可以不 -->
+	<select id = "queryAll" parameterType = "map" resultMap = "OrderMap" >
+		select t1.oid,t1.odate,t1.onum,t1.opaytype,t1.opaymodel,t1.oispay,t1.ogetintegration,t1.omoney,t1.ogoods,
+		t1.oisinvoice,t1.ostae,t1.onoinfo,t1.oshfs,t1.oshname,t1.oshtel,t1.oshaddress,t1.oexpress,t1.oexpresssn,t2.id,t2.username,t3.cid,t3.cname
+		from orders t1 INNER JOIN	sys_user t2 ON t1.urid=t2.id INNER JOIN company t3 ON t1.cid=t3.cid		
+		<trim prefix = "WHERE" prefixOverrides = "AND |OR " >
+			<!-- <if test="cid !=null">
+				and t1.cid=%${cid}%
+			</if> -->
+			<if test = "urid !=null" >
+				and t1.urid= #{urid}
+			</if >
+			<if test = "oexpresssn !=null" >
+				and t1.oexpresssn like '%${oexpresssn}%'
+			</if >
+			<if test = "oshtel !=null" >
+				and t1.oshtel like '%${oshtel}%'
+			</if >
+		</trim >
+		ORDER BY t1.oid DESC
+	</select >
+	<update id = "updateOrderById" parameterType = "OrderRequest" >
+
+		update orders
+		<set>
+			<if test="oinfo != null">oinfo=#{oinfo},</if>
+			<if test="ofreight != null">ofreight=#{ofreight},</if>
+			<if test="onoun != null">onoun=#{onoun},</if>
+			<if test="oexpresssn != null">oexpresssn=#{oexpresssn},</if>
+			<if test="oexpress != null">oexpress=#{oexpress},</if>
+			<if test="oshaddress != null">oshaddress=#{oshaddress},</if>
+			<if test="oshtel != null">oshtel=#{oshtel},</if>
+			<if test="oshname != null">oshname=#{oshname},</if>
+			<if test="oshfs != null">oshfs=#{oshfs},</if>
+			<if test="onoinfo != null">onoinfo=#{onoinfo},</if>
+			<if test="ostae != null">ostae=#{ostae},</if>
+			<if test="oisinvoice != null">oisinvoice=#{oisinvoice},</if>
+			<if test="ogoods != null">ogoods=#{ogoods},</if>
+			<if test="omoney != null">omoney=#{omoney},</if>
+			<if test="ogetintegration != null">ogetintegration=#{ogetintegration},</if>
+			<if test="oispay != null">oispay=#{oispay},</if>
+			<if test="opaymodel != null">opaymodel=#{opaymodel},</if>
+			<if test="opaytype != null">opaytype=#{opaytype},</if>
+			<if test="onum != null">onum=#{onum},</if>
+			<if test="cid != null">cid=#{cid},</if>
+			<if test="urid != null">urid=#{urid},</if>
+		</set>
+		where oid = #{oid}
+	</update >
+	
+	<select id = "queryById" parameterType = "Integer" resultMap = "OrderMap" >
+		select t1.oid,t1.odate,t1.onum,t1.opaytype,t1.opaymodel,t1.oispay,t1.ogetintegration,t1.omoney,t1.ogoods,
+		t1.oisinvoice,t1.ostae,t1.onoinfo,t1.oshfs,t1.oshname,t1.oshtel,t1.oshaddress,t1.oexpress,t1.oexpresssn,t2.id,t2.username,t3.cid,t3.cname
+		from orders t1 INNER JOIN	sys_user t2 ON t1.urid=t2.id INNER JOIN company t3 ON t1.cid=t3.cid
+		where t1.oid= #{oid}
+		
+	</select >
+	
+	
+	<resultMap id = "OrderResponseMap"
+	           type = "OrderResponse" >
+        <result column = "oid" property = "oid" />
+        <result column = "urid" property = "urid" />
+        <result column = "cid" property = "cid" />
+		<result column = "sname" property = "sname" />
+        <result column = "odate" property = "odate" />
+        <result column = "onum" property = "onum" />
+        <result column = "omoney" property = "omoney" />
+        <result column = "ostae" property = "ostae" />
+        <result column = "img" property = "img" />
+        <result column = "onoun" property = "onoun" />
+        <result column = "opaytype" property = "opaytype" />
+        <result column = "opaymodel" property = "opaymodel" />
+        <result column = "oispay" property = "oispay" />
+        <result column = "oisinvoice" property = "oisinvoice" />
+        <result column = "onoinfo" property = "onoinfo" />
+        <result column = "oshfs" property = "oshfs" />
+        <result column = "oshname" property = "oshname" />
+        <result column = "oshtel" property = "oshtel" />
+        <result column = "oshaddress" property = "oshaddress" />
+        <result column = "oexpress" property = "oexpress" />
+        <result column = "oexpresssn" property = "oexpresssn" />
+    </resultMap >
+	<!--订单列表-->
+	<select id = "findOrderAll" parameterType = "OrderRequest" resultMap = "OrderResponseMap" >
+		SELECT os.`oid`,os.`cid`,sh.sname,os.`odate`,os.`onum`,os.`omoney`,os.`ostae`,
+        os.`onoun`,os.opaytype,os.opaymodel,os.oispay,os.oisinvoice,
+        os.oshname,os.oshtel,os.oshaddress
+        FROM `orders` os
+        LEFT JOIN `shop` sh ON sh.sid=os.`cid`
+        <where>
+			<if test="ostae !=null">
+			and ostae=#{ostae}
+			</if>
+			<if test="oexpresssn !=null">
+			and oexpresssn=#{oexpresssn}
+			</if>
+			<if test="oshtel !=null">
+			and oshtel=#{oshtel}
+			</if>
+			<if test="oisinvoice !=null">
+			and oisinvoice=#{oisinvoice}
+			</if>
+			<if test="urid !=null">
+			and urid=#{urid}
+			</if>
+		</where>
+        ORDER BY os.oid DESC
+	</select >
+	<resultMap id = "OrderInfoResponseMap"
+	           type = "OrderInfoResponse" >
+        <result column = "oid" property = "oid" />
+        <result column = "urid" property = "urid" />
+        <result column = "cid" property = "cid" />
+		<result column = "odate" property = "odate" />
+        <result column = "onum" property = "onum" />
+        <result column = "opaytype" property = "opaytype" />
+        <result column = "opaymodel" property = "opaymodel" />
+        <result column = "oispay" property = "oispay" />
+        <result column = "ogetintegration" property = "ogetintegration" />
+        <result column = "omoney" property = "omoney" />
+        <result column = "ogoods" property = "ogoods" />
+        <result column = "oisinvoice" property = "oisinvoice" />
+        <result column = "ostae" property = "ostae" />
+        <result column = "onoinfo" property = "onoinfo" />
+        <result column = "oshfs" property = "oshfs" />
+        <result column = "oshname" property = "oshname" />
+        <result column = "oshtel" property = "oshtel" />
+        <result column = "oshaddress" property = "oshaddress" />
+        <result column = "oexpress" property = "oexpress" />
+        <result column = "oexpresssn" property = "oexpresssn" />
+		<result column = "onoun" property = "onoun" />
+		<result column = "ofreight" property = "ofreight" />
+		<result column = "omsg" property = "omsg" />
+        <result column = "oinfo" property = "oinfo" />
+        <result column = "sname" property = "sname" />
+        <result column = "saddress" property = "saddress" />
+        <result column = "stel" property = "stel" />
+        <result column = "slogo" property = "slogo" />
+        
+    </resultMap >
+	<!--订单详情-->
+	<select id = "findOrderInfoByOid" parameterType = "Integer" resultType="OrderInfoResponse" >
+		SELECT os.`oid`,os.`urid`,os.`cid`,os.`odate`,os.`onum`,os.`opaytype`,
+		os.`opaymodel`,os.`oispay`,os.`ogetintegration`,os.`omoney`,os.`ogoods`,
+		os.`oisinvoice`,os.`ostae`,os.`onoinfo`,os.`oshfs`,os.`oshname`,os.`oshtel`,
+		os.`oshaddress`,os.`oexpress`,os.`oexpresssn`,os.`onoun`,os.`ofreight`,
+		os.`oinfo`,os.`omsg`,sh.`sname`,sh.`saddress`,sh.`stel`,sh.`slogo`
+		FROM `orders` os
+		LEFT JOIN `shop` sh ON sh.`sid`=os.`cid`
+		WHERE os.`oid`=#{oid}
+	</select >
+	
+	
+	
+	<resultMap id = "OrderProductResponseMap"
+	           type = "OrderProductResponse" >
+        <result column = "id" property = "id" />
+        <result column = "pname" property = "pname" />
+        <result column = "price" property = "price" />
+		<result column = "yprice" property = "yprice" />
+        <result column = "ognum" property = "ognum" />
+        <result column = "ogmoney" property = "ogmoney" />
+        <result column = "url" property = "url" />
+       
+    </resultMap >
+	
+	<!--订单下商品-->
+	<select id = "findOrderProductByOid" parameterType = "int" resultMap = "OrderProductResponseMap" >
+		SELECT  pt.`id`,pt.`pname`,pt.`price`,pt.`yprice`,os.`ognum`,os.`ogmoney`,
+		pg.`url`
+		FROM `order_goods` os
+		LEFT JOIN `product`  pt ON pt.`id`=os.`vid`
+		LEFT JOIN `productimg` pg ON pt.`id`=pg.`pid`
+		WHERE os.`oid`=#{oid}
+		AND os.`vtype`=0
+	</select >
+	
+	<!--订单下代金券-->
+	<select id = "findOrderVoucherByOid" parameterType = "int" resultMap = "OrderProductResponseMap" >
+		select  vo.`vid` as id ,vo.`vimg` as url ,vo.`vtitle` as pname,
+		vo.`vmoney` as price,vo.`vprice` as yprice,
+		os.`ognum`,os.`ogmoney`
+		from `order_goods` os
+		left join `voucher` vo on vo.`vid`=os.`vid`
+		where os.oid=#{oid}
+		AND os.`vtype`=1
+	</select >
+	
+	<delete id = "delteOrderById" parameterType = "Integer" >
+		delete from orders where oid = #{oid}
+	</delete >
+</mapper >

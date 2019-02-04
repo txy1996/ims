@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxPositionDao">
+
+	<resultMap id="SetPositionMap" type="WxPosition">
+		<result column="pid" property="pid" />
+		<result column="pname" property="pname" />
+		<result column="pinfo" property="pinfo" />
+	</resultMap>
+
+
+	<!--微信:职位头衔 -->
+	<insert id="saveWxPosition" parameterType="WxPosition">
+		<selectKey resultType="int" order="AFTER" keyProperty="pid">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into `position`
+		(pname,pinfo)
+		values(#{pname},#{pinfo})
+	</insert>
+
+	<!--微信:查询职位头衔 -->
+	<select id="findWxPosition" parameterType="WxPosition"
+		resultType="WxPosition">
+		select po.`pid`,po.`pname`,po.`pinfo`
+		from `position` po
+		where po.`pid`=#{pid}
+	</select>
+
+	<!--微信:删除职位头衔 -->
+	<delete id="deleteWxPosition" parameterType="int">
+		DELETE FROM
+		`position`
+		WHERE pid =#{pid}
+	</delete>
+	<!-- 微信:修改职位头衔 -->
+	<update id="updateWxPosition" parameterType="WxPosition">
+		UPDATE position
+		<set>
+			<if test="pname != null">pname=#{pname},</if>
+			<if test="pinfo != null">pinfo=#{pinfo},</if>
+		</set>
+		WHERE pid =#{pid}
+	</update>
+</mapper>

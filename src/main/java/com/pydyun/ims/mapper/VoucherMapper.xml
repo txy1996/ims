@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.VoucherDao">
+
+<resultMap id="VoucherResultMap" type="Voucher">
+		<result column="vid" property="vid" />
+		<result column="vcid" property="vcid" />
+		<result column="vrid" property="vrid" />
+		<result column="vrange" property="vrange" />
+		<result column="vmoney" property="vmoney" />
+		<result column="vcost" property="vcost" />
+		<result column="vprice" property="vprice" />
+		<result column="vsdate" property="vsdate" />
+		<result column="vodate" property="vodate" />
+		<result column="visood" property="visood" />
+		<result column="vgoods" property="vgoods" />
+		<result column="vintegration" property="vintegration" />
+		<result column="vimg" property="vimg" />
+		<result column="vtitle" property="vtitle" />
+		<result column="vinfo" property="vinfo" />
+		<result column="vrefund" property="vrefund" />
+		<result column="uaid" property="uaid" />
+		<result column="vnum" property="vnum" />
+		<result column="vstore" property="vstore" />
+		<result column="xdprice" property="xdprice" />
+		<result column="xdpcid" property="xdpcid" />
+		<association property="voucherclass" javaType="Voucherclass">
+		<result column="vcid" property="vcid" />
+		<result column="vcvcid" property="vcvcid" />
+		<result column="vcname" property="vcname" />
+		<result column="vcinfo" property="vcinfo" />
+		</association>
+		<association property="adminusers" javaType="Adminusers">
+			<id property="auid" column="auid" />
+			<result property="dtid" column="dtid" />
+			<result property="auname" column="auname" />
+			<result property="aupwd" column="aupwd" />
+			<result property="aurdate" column="aurdate" />
+			<result property="auldate" column="auldate" />
+			<result property="aulip" column="aulip" />
+		</association>
+	</resultMap>
+	<select id="getMessage" resultMap="VoucherResultMap">
+		select t1.vid,t1.vcid,t1.vrange,t1.vmoney,t1.vcost,t1.vprice,t1.vsdate,
+			   t1.vodate,t1.visood,t1.vgoods,t1.vintegration,t1.vimg,t1.vtitle,
+			   t1.vinfo,t1.vrefund,t1.uaid,t2.vcname,t2.vcinfo
+ from voucher  t1,voucherclass t2 where t1.vcid = t2.vcid 
+	</select>
+	<delete id="deltMessage" parameterType="Integer">
+		delete from voucher where vid = #{vid}
+	</delete>
+	
+	<select id="selById" parameterType="Integer"
+		resultMap="VoucherResultMap">
+			select t1.vid,t1.vcid,t1.vrange,t1.vmoney,t1.vcost,t1.vprice,t1.vsdate,
+			   t1.vodate,t1.visood,t1.vgoods,t1.vintegration,t1.vimg,t1.vtitle,
+			   t1.vinfo,t1.vrefund,t1.uaid,t2.vcname,t2.vcinfo
+ from voucher  t1,voucherclass t2 where t1.vcid = t2.vcid and t1.vid = #{vid}	
+	</select>
+	
+	<update id="updateMessage" parameterType="Voucher">
+		update voucher set
+		vcid =#{vcid},
+		vrange = #{vrange},
+		vmoney = #{vmoney},
+		vcost = #{vcost},
+		vprice = #{vprice},
+		vsdate = #{vsdate},
+		vodate = #{vodate},
+		visood =#{visood},
+		vgoods =#{vgoods},
+		vintegration = #{vintegration},
+		vimg =#{vimg},
+		vtitle= #{vtitle},
+		vinfo =#{vinfo},
+		vrefund = #{vrefund},
+		uaid =#{uaid}
+		where vid = #{vid}
+	</update>
+	
+	<insert id="addMessage" parameterType="Voucher" useGeneratedKeys="true"
+		keyProperty="vid">
+	insert into voucher (vcid,vrange,vmoney,vcost,vprice,vsdate,vodate,visood,vgoods,vintegration,vimg,vtitle,vinfo,vrefund,uaid) 
+	values 
+	(#{vcid},#{vrange},#{vmoney},#{vcost},#{vprice},#{vsdate},#{vodate},#{visood},#{vgoods},#{vintegration},#{vimg},#{vtitle},#{vinfo},#{vrefund},#{uaid})
+	</insert>
+	<select id="findbys" parameterType="String" resultType="Voucher">
+		SELECT vtitle FROM voucher WHERE vrange LIKE '%${vrange}%'
+	</select>
+	
+	<!-- <insert id="addMessage1" parameterType="Voucher" useGeneratedKeys="true"
+		keyProperty="vid">
+		INSERT INTO voucher (vcid,vrid,vrange,vmoney,vcost,vprice,vsdate,vodate,visood,vgoods,vintegration,vimg,vtitle,vinfo,vrefund,uaid,vnum,vstore) 
+		VALUES (#{vcid},#{vrid},#{vrange},#{vmoney},#{vcost},#{vprice},#{vsdate},#{vodate},#{visood},#{vgoods},#{vintegration},#{vimg},#{vtitle},#{vinfo},#{vrefund},#{uaid},#{vnum},#{vstore})
+	</insert> -->
+	
+	<insert id ="addMessage1" parameterType="java.util.List" >
+            <selectKey resultType ="java.lang.Integer" keyProperty= "id"
+                 order= "AFTER">
+                SELECT LAST_INSERT_ID()
+            </selectKey >
+           INSERT INTO voucher (vcid,vrid,vrange,vmoney,vcost,vprice,vsdate,vodate,visood,vgoods,vintegration,vimg,vtitle,vinfo,vrefund,uaid,vnum,vstore) 
+			VALUES
+            <foreach collection ="list" item="Voucher" index= "index" separator =",">
+                (
+                #{Voucher.vcid},#{Voucher.vrid},#{Voucher.vrange},#{Voucher.vmoney},#{Voucher.vcost},#{Voucher.vprice},
+                #{Voucher.vsdate},#{Voucher.vodate},#{Voucher.visood},#{Voucher.vgoods},#{Voucher.vintegration},#{Voucher.vimg},
+                #{Voucher.vtitle},#{Voucher.vinfo},#{Voucher.vrefund},#{Voucher.uaid},#{Voucher.vnum},#{Voucher.vstore}
+                )
+            </foreach >
+     </insert >
+	
+	<update id="update">
+		UPDATE voucher c SET c.vodate = DATE_ADD(c.vodate, INTERVAL #{vodate} DAY) WHERE c.vid =#{vid};
+	</update>
+	
+	<select id="findall1" resultType="Voucher">
+		SELECT a.`vid`,a.`vtitle`,a.`vmoney`,a.`vprice`,a.`vrange`,a.`vnum`,a.`vstore`,a.`vsdate`,a.`vodate` 
+		FROM voucher a WHERE a.`vrange`=#{vrange} and a.vstore!=0
+	 <if test="vsdate !=null">
+		and a.vsdate &gt;= '${vsdate}'
+	</if>
+	<if test="vodate !=null">
+		and a.vodate &lt;= '${vodate}'
+	</if> 
+	<if test="vstore !=null">
+		and a.`vstore` BETWEEN #{vstore} AND #{vstore2}
+	</if>
+	</select>
+	
+	<select id="getmessage1" parameterType="int" resultType="Voucher">
+		SELECT a.`vid`,a.`vtitle`,a.`vmoney`,a.`vprice`,a.`vrange`,a.`vnum`,a.`vstore`,a.`vsdate`,a.`vodate` 
+		FROM voucher a WHERE a.vid=#{vid}
+	</select>
+
+	<update id="update1">
+		UPDATE voucher  SET
+		vtitle=#{vtitle},vmoney=#{vmoney},vprice=#{vprice},
+		vrange=#{vrange},vnum=#{vnum},vstore=#{vstore},
+		vsdate=#{vsdate},vodate=#{vodate}
+		where vid=#{vid}
+	</update>
+	
+	<update id="deleteshopvoucher" parameterType="int">
+		UPDATE voucher  SET vstore=0 where vid=#{vid}
+	</update>
+	
+	<select id="selectmaxid" resultType="java.lang.Integer">
+		SELECT MAX(vid) FROM voucher	
+	</select>
+	<update id="alterTable">
+		ALTER TABLE voucher AUTO_INCREMENT = 1;
+	</update>
+	
+	<insert id="addMessage2" parameterType="Voucher" useGeneratedKeys="true"
+		keyProperty="vid">
+		INSERT INTO voucher (vcid,vrid,vrange,vmoney,vcost,vprice,vsdate,vodate,visood,vgoods,vintegration,vimg,vtitle,vinfo,vrefund,uaid,vnum,vstore,xdprice,xdpcid) 
+			VALUES(#{vcid},#{vrid},#{vrange},#{vmoney},#{vcost},#{vprice},
+                #{vsdate},#{vodate},#{visood},#{vgoods},#{vintegration},#{vimg},
+                #{vtitle},#{vinfo},#{vrefund},#{uaid},#{vnum},#{vstore},#{xdprice},#{xdpcid})
+	</insert>
+	
+	<select id="findbyid" parameterType="java.lang.Integer" resultType="Voucher">
+		 SELECT vrid,vrange,vtitle FROM voucher WHERE vid=#{vid}
+	</select>
+	
+	<update id="updatevstore" parameterType="java.lang.Integer">
+		UPDATE voucher SET vstore=vstore-#{vstore} WHERE vid=#{vid}
+	</update>
+	
+	<select id="selectimg" parameterType="java.lang.Integer" resultType="java.lang.String">
+		select vimg from voucher where vid=#{vid}
+	</select>
+</mapper>

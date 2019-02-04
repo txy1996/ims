@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.CouponclassDao">
+	<resultMap id="SetResultMap" type="Couponclass">
+		<result column="ccid" property="ccid" />
+		<result column="ccname" property="ccname" />
+		<result column="ccinfo" property="ccinfo" />
+		<result column="ccccid" property="ccccid" />
+
+	</resultMap>
+	<select id="select" resultMap="SetResultMap">
+		select ccid,ccname,ccinfo,ccccid
+		from couponclass
+	</select>
+	<select id = "getcoupon" parameterType="int" resultMap="SetResultMap">
+	select * from couponclass where ccid = #{ccid}
+	</select>
+	<delete id="delete" parameterType="Integer">
+		delete from couponclass where ccid = #{ccid}
+	</delete>
+	<insert id="add" parameterType="Couponclass" useGeneratedKeys="true"
+		keyProperty="ccid">
+		insert into couponclass(ccid,ccname,ccinfo,ccccid) values (#{ccid},#{ccname},#{ccinfo},#{ccccid})
+		</insert>
+		<update id="update" parameterType="Couponclass">
+		update couponclass
+		<set>
+		    <if test="ccname != null">ccname=#{ccname},</if>
+			<if test="ccinfo != null">ccinfo=#{ccinfo},</if>
+			<if test="ccccid != null">ccccid=#{ccccid},</if>
+		</set>
+		where ccid = #{ccid}
+		</update>
+		
+		<select id="getName" parameterType="String" resultType="Couponclass">
+		select ccid ,ccname from couponclass
+		</select>
+		
+		<select id="getccname"  resultType="Couponclass">
+		select * from couponclass
+		</select>
+</mapper>

@@ -1,0 +1,480 @@
+var path = $("#sysPath").val();
+
+// 展示提示框
+function showTips(content) {
+    $("#op-tips-content").html(content);
+    $("#op-tips-dialog").modal("show");
+    setTimeout("hideTips()", 2500);
+
+}
+
+function hideTips() {
+    $("#op-tips-dialog").modal("hide");
+    window.location.reload()
+}
+
+
+// 重置用户表单
+function resetUserForm(title, button) {
+    $(".user-form input[type='text']").val("");
+    $(".user-form input[name='password']").prop("disabled", false);
+    $(".user-form input[type='radio']").prop("checked", false);
+    $(".user-form-title").html(title);
+    $(".user-submit").html('<i class="ace-icon fa fa-check"></i>' + button);
+}
+
+// 获取所有角色
+function getAllRoles(obj) {
+    obj.html("");
+    $
+        .ajax({
+            url: path + "listRoles",
+            type: "POST",
+            dataType: "json",
+            success: function (data) {
+                for (var i in data) {
+                    obj
+                        .append("<label><input class='ace' type='radio' name='roleIds' value='"
+                            + data[i].id
+                            + "'/><span class='lbl'>["
+                            + data[i].name
+                            + "]-"
+                            + data[i].description);
+                    obj.append("</span></label><br>");
+                }
+            }
+        });
+}
+
+// 根据用户名获取相应角色
+function getRolesByUsername(username, doSuccess) {
+    $.ajax({
+        url: "showRoles.html",
+        data: {
+            username: username
+        },
+        type: "POST",
+        dataType: "json",
+        success: function (data) {
+            doSuccess(data);
+        }
+    });
+}
+
+// 添加用户框体
+$(".show-add-form").click(
+    function () {
+        resetUserForm("添加新用户", "添加");
+        $(".user-form input[type='radio'][name='state'][value='1']").prop(
+            "checked", true);
+        getAllRoles($(".roles-div"));
+    });
+
+// 更新用户框体
+$(".user-list")
+    .on(
+        "click",
+        ".show-update-form",
+        function () {
+            resetUserForm("更新用户信息", "更新");
+            getAllRoles($(".roles-div"));
+            var userId = $(this).parents("tr").find(".userId").html();
+            $("input[name='id']").val(userId);
+            var username = $(this).parents("tr").find(".username")
+                .html();
+            $("input[name='username']").val(username);
+            $
+                .ajax({
+                    url: "getUser.html",
+                    data: {
+                        username: username
+                    },
+                    type: "POST",
+                    dataType: "json",
+                    success: function (data) {
+                        /*$("input[name='urtname']")
+                                .val(data.urtname);*/
+                        $("input[name='real_name']")
+                            .val(data.real_name);
+                        $("input[name='urautograph']").val(
+                            data.urautograph);
+                        $("input[name='mobile']").val(data.mobile);
+                        $("input[name='password']").prop(
+                            "disabled", true);
+                        $("input[name='realName']").val(
+                            data.realName);
+                        if (data.state === 0) {
+                            $(
+                                ".user-form input[type='radio'][name='state']")
+                                .prop("checked", false);
+                            $(
+                                ".user-form input[type='radio'][name='state'][value='0']")
+                                .prop("checked", true);
+                        } else if (data.state === 1) {
+                            $(
+                                ".user-form input[type='radio'][name='state']")
+                                .prop("checked", false);
+                            $(
+                                ".user-form input[type='radio'][name='state'][value='1']")
+                                .prop("checked", true);
+                        } else if (data.state === 2) {
+                            $(
+                                ".user-form input[type='radio'][name='state']")
+                                .prop("checked", false);
+                            $(
+                                ".user-form input[type='radio'][name='state'][value='2']")
+                                .prop("checked", true);
+                        } else {
+                            $(
+                                ".user-form input[type='radio'][name='state']")
+                                .prop("checked", false);
+                        }
+                    }
+                });
+            getRolesByUsername(username, function (data) {
+                for (var i in data) {
+                    $(
+                        '.roles-div input[name="roleIds"][value="'
+                        + data[i].id + '"]').prop(
+                        "checked", true);
+                }
+            });
+        });
+
+// 添加、更新动作
+$(".user-submit").click(function () {
+    if ($(this).html().indexOf("添加") > 0) {
+        // 添加新用户
+        $.ajax({
+            url: "add.html",
+            type: "POST",
+            data: $(".user-form").serialize(),
+            dataType: "json",
+            success: function (data) {
+                $("#user-form-div").modal("hide");
+                showTips("添加成功！");
+                $(".close-tip").click(function () {
+                    setTimeout(function () {
+                        window.location.reload()
+                    }, 220);
+                })
+            },
+            error: function () {
+                showTips("添加失败！");
+            }
+        });
+    } else {
+        // 更新用户信息
+        $.ajax({
+            url: "update.html",
+            data: $(".user-form").serialize(),
+            type: "POST",
+            success: function () {
+                $("#user-form-div").modal("hide");
+                showTips("更新成功！");
+                $(".close-tip").click(function () {
+                    setTimeout(function () {
+                        window.location.reload()
+                    }, 220);
+                })
+            },
+            error: function () {
+                showTips("更新失败！");
+            }
+        });
+    }
+});
+
+// 重置用户密码
+$(".user-list").on("click", ".reset-password", function () {
+    var userTr = $(this).parents("tr");
+    var username = userTr.find(".username").html();
+    if (confirm('确认重置用户[' + username + ']的密码吗？')) {
+        $.ajax({
+            url: "resetPassword.html",
+            data: {
+                username: username
+            },
+            type: "POST",
+            success: function () {
+                showTips("密码已重置为：123456，请及时登录并修改密码！");
+
+            },
+            error: function () {
+                showTips("重置密码失败！");
+            }
+        });
+    }
+});
+
+// 跳转订单界面
+$(".user-list").on("click", ".jump-order", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    // $.ajax({
+    //     url: "../order/list.html",
+    //     dataType: "html",// 特别重要
+    //     data: {
+    //         urid: userId
+    //     },
+    //     type: "POST",
+    //     success: function (data) {
+    //         $("#Refreshbody").html(data)
+    //     },
+    //     error: function () {
+    //
+    //     }
+    // });
+    var url = "../order/findOrderAll?urid=" + userId;
+    window.location.href = url
+});
+
+// 跳转金币日志界面
+$(".user-list").on("click", ".jump-gold", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    var username = userTr.find(".username").html();
+    var url = "../goods_user/list?urid=" + userId;
+    window.location.href = url
+
+
+});
+
+// 跳转积分日志界面
+$(".user-list").on("click", ".jump-isum", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    var username = userTr.find(".username").html();
+    var url = "../integral/list?urid=" + userId;
+    window.location.href = url
+
+});
+
+// 跳转用户评论记录界面
+$(".user-list").on("click", ".jump-comment", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    $.ajax({
+        url: "../userAssess/list.html",
+        dataType: "html",// 特别重要
+        data: {
+            urid: userId,
+
+        },
+        type: "POST",
+        success: function (data) {
+            $("#Refreshbody").html(data)
+        },
+        error: function () {
+
+        }
+    });
+
+});
+// 跳转标签界面
+$(".user-list").on("click", ".jump-label", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    $.ajax({
+        url: "../label/list.html",
+        dataType: "html",// 特别重要
+        data: {
+            urid: userId,
+
+        },
+        type: "POST",
+        success: function (data) {
+            $("#Refreshbody").html(data)
+        },
+        error: function () {
+
+        }
+    });
+
+});
+// 跳转方案界面
+$(".user-list").on("click", ".jump-scheme", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    $.ajax({
+        url: "../scheme/list.html",
+        dataType: "html",// 特别重要
+        data: {
+            urid: userId,
+
+        },
+        type: "POST",
+        success: function (data) {
+            $("#Refreshbody").html(data)
+        },
+        error: function () {
+
+        }
+    });
+
+});
+
+
+//跳转用户代金券界面
+$(".user-list").on("click", ".voucher", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    $.ajax({
+        url: "../uservoucher/list.html",
+        dataType: "html",// 特别重要
+        data: {
+            urid: userId,
+
+        },
+        type: "POST",
+        success: function (data) {
+            $("#Refreshbody").html(data)
+        },
+        error: function () {
+
+        }
+    });
+
+});
+
+
+//跳转用户优惠券界面
+$(".user-list").on("click", ".usercoupon", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    $.ajax({
+        url: "../usercoupon/list.html",
+        dataType: "html",// 特别重要
+        data: {
+            urid: userId,
+
+        },
+        type: "POST",
+        success: function (data) {
+            $("#Refreshbody").html(data)
+        },
+        error: function () {
+
+        }
+    });
+
+});
+// 锁定用户
+$(".user-list").on("click", ".lock-user", function () {
+    var userTr = $(this).parents("tr");
+    var username = userTr.find(".username").html();
+    var state = userTr.find(".state").val();
+    var userId = userTr.find(".userId").html();
+    console.log(state)
+
+    if (state == 0 || state == 2) {
+        state = 1;
+    } else if (state == 1) {
+        state = 2;
+    }
+    if (confirm('确认对用户[' + username + ']进行此操作吗？')) {
+        $.ajax({
+            url: "update.html",
+            data: {
+                id: userId,
+                state: state
+            },
+            type: "POST",
+            success: function () {
+                showTips("操作成功!");
+
+            },
+            error: function () {
+                showTips("操作失败!");
+
+            }
+        });
+    }
+});
+
+
+// 删除单个用户
+$(".user-list").on("click", ".delete-this-user", function () {
+    var userTr = $(this).parents("tr");
+    var userId = userTr.find(".userId").html();
+    var username = userTr.find(".username").html();
+    if (confirm('确认删除用户[' + username + ']吗？')) {
+        $.ajax({
+            url: "delete.html",
+            data: {
+                userId: userId
+            },
+            type: "POST",
+            success: function () {
+                userTr.remove();
+                showTips("删除成功！");
+
+            },
+            error: function () {
+                showTips("删除失败！");
+            }
+        });
+    }
+});
+
+// 全选/取消全选出现的active阴影
+var active_class = 'active';
+$('#simple-table > thead > tr > th input[type=checkbox]').eq(0).on(
+    'click',
+    function () {
+        var th_checked = this.checked;// checkbox inside "TH" table header
+
+        $(this).closest('table').find('tbody > tr').each(
+            function () {
+                var row = this;
+                if (th_checked)
+                    $(row).addClass(active_class).find(
+                        'input[type=checkbox]').eq(0).prop(
+                        'checked', true);
+                else
+                    $(row).removeClass(active_class).find(
+                        'input[type=checkbox]').eq(0).prop(
+                        'checked', false);
+            });
+    });
+
+// 单行选中出现active阴影
+$('#simple-table').on('click', 'td input[type=checkbox]', function () {
+    var $row = $(this).closest('tr');
+    if ($row.is('.detail-row '))
+        return;
+    if (this.checked)
+        $row.addClass(active_class);
+    else
+        $row.removeClass(active_class);
+});
+
+// 批量删除用户
+$(".delete-selected-confirm").click(function () {
+    $("#delete-confirm-dialog").modal("hide");
+    var cbs = $("input[name='userIds']:checked")
+    if (cbs.length === 0) {
+        showTips("您未选择用户！");
+    } else {
+        var userIds = new Array();
+        $.each(cbs, function (i, cb) {
+            userIds[i] = cb.value;
+        });
+
+        $.ajax({
+            url: "deleteMore.html",
+            data: {
+                userIds: userIds
+            },
+            type: "POST",
+            traditional: true,
+            success: function () {
+                cbs.parent().parent().parent().remove();
+                showTips("删除所选成功！");
+            },
+            error: function () {
+                showTips("删除所选失败！");
+            }
+        });
+    }
+});

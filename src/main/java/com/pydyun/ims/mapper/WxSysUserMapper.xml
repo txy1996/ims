@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxSysUserDao">
+
+	<resultMap id="SetResultMap" type="Sys_User">
+		<id property="id" column="id" />
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="salt" column="salt" />
+		<result property="createTime" column="create_time" />
+		<result property="state" column="state" />
+		<result property="real_name" column="real_name" />
+		<result property="gender" column="gender" />
+		<result property="nation" column="nation" />
+		<result property="birth" column="birth" />
+		<result property="urautograph" column="urautograph" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="department" column="department" />
+		<result property="position" column="position" />
+		<result property="note" column="note" />
+		<result property="head" column="head" />
+		<result property="activate_time" column="activate_time" />
+		<result property="code" column="code" />
+		<result property="maileCode" column="maileCode" />
+		<result property="wx_OpenId" column="wx_OpenId" />
+		<result property="qq_openid" column="qq_openid" />
+		<result property="zfb_openid" column="zfb_openid" />
+		<result property="referee" column="referee" />
+	</resultMap>
+
+
+	<!--微信:用户信息 -->
+	<insert id="saveWxSysUser" parameterType="Sys_User">
+		insert into `sys_user`
+		(username,password,salt,create_time,state,gender,head,activate_time,wx_OpenId)
+		values(#{username},#{password},#{salt},CURRENT_TIMESTAMP,#{state},#{gender},#{head},CURRENT_TIMESTAMP,#{wx_OpenId})
+		<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<!--微信:查询用户信息 -->
+	<select id="findWxSysUser" parameterType="Sys_User"
+		resultType="Sys_User">
+		SELECT
+		su.`id`,su.`username`,su.`password`,su.`create_time`,su.`state`,su.`real_name`,
+		su.`gender`,su.`nation`,su.`birth`,su.`urautograph`,su.`mobile`,su.`email`,
+		su.`department`,su.`position`,su.`note`,su.`head`
+		FROM `sys_user` su
+		WHERE su.`id`=#{id}
+	</select>
+	<!--微信:查询用户信息 -->
+	<select id="findWxSysUserByWxOpenId" parameterType="string"
+		resultType="Sys_User">
+		SELECT
+		su.`id`,su.`username`,su.`password`,su.`create_time`,su.`state`,su.`real_name`,
+		su.`gender`,su.`nation`,su.`birth`,su.`urautograph`,su.`mobile`,su.`email`,
+		su.`department`,su.`position`,su.`note`,su.`head`
+		FROM `sys_user` su
+		WHERE su.`wx_OpenId`=#{wx_OpenId}
+	</select>
+
+	<!--微信:删除用户信息 -->
+	<delete id="deleteWxSysUser" parameterType="int">
+		DELETE FROM
+		`sys_user`
+		WHERE id =#{id}
+	</delete>
+	<!-- 微信:修改用户信息 -->
+	<update id="updateWxSysUser" parameterType="Sys_User">
+		UPDATE sys_user
+		<set>
+			<if test="username != null">username=#{username},</if>
+			<if test="password != null">password=#{password},</if>
+			<if test="salt != null">salt=#{salt},</if>
+			<if test="state != null">state=#{state},</if>
+			<if test="real_name != null">real_name=#{real_name},</if>
+			<if test="gender != null">gender=#{gender},</if>
+			<if test="nation != null">nation=#{nation},</if>
+			<if test="birth != null">birth=#{birth},</if>
+			<if test="urautograph != null">urautograph=#{urautograph},</if>
+			<if test="mobile != null">mobile=#{mobile},</if>
+			<if test="email != null">email=#{email},</if>
+			<if test="department != null">department=#{department},</if>
+			<if test="position != null">position=#{position},</if>
+			<if test="note != null">note=#{note},</if>
+			<if test="head != null">head=#{head},</if>
+			<if test="activate_time != null">activate_time=#{activate_time},</if>
+			<if test="code != null">code=#{code}</if>
+		</set>
+		WHERE id =#{id}
+	</update>
+</mapper>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxProductimgDao">
+	<!-- <resultMap id="BaseResultMap" type="Productimg"> <id column="id" property="id" 
+		/> <result column="pid" property="pid" /> <result column="url" property="url" 
+		/> <result column="tfimg" property="tfimg" /> <result column="name" property="name" 
+		/> <result column="updata" property="updata" /> </resultMap> -->
+
+	<select id="findimg" resultType="WxProductimg" parameterType="String">
+		SELECT id,pid,url,tfimg,NAME,updata FROM productimg WHERE pid IN(${ids})
+	</select>
+
+</mapper>

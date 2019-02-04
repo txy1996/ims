@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.SchemeAndStageAndShopDao" >
+	<resultMap type = "SchemeAndStageAndShop" id = "BaseResultMap" >
+		<id column = "sssid" property = "sssid" />
+		<result column = "shopid" property = "shopid" />
+		<result column = "ssid" property = "ssid" />
+		<result column = "ssort" property = "ssort" />
+		<result column = "ssimgs" property = "ssimgs" />
+		<result column = "sreplace" property = "sreplace" />
+	</resultMap >
+	<!--新增方案所含阶段商家列表 -->
+	<insert id = "addSchemeAndStageAndShop" parameterType = "SchemeAndStageAndShop"
+	        useGeneratedKeys = "true" keyProperty = "sssid" >
+		insert into s_s_shop
+		(shopid,ssid,ssimgs,sreplace)
+		values(#{shopid},#{ssid},#{ssimgs},#{sreplace})
+	</insert >
+	
+	<!-- 修改方案所含阶段商家列表-->
+	<update id = "updateSchemeAndStageAndShop" parameterType = "SchemeAndStageAndShop" >
+		update s_s_shop
+		<set >
+			<if test = "shopid != null" >shopid = #{shopid},</if >
+			<if test = "ssid != null" >ssid = #{ssid},</if >
+			<if test = "ssimgs != null" >ssimgs = #{ssimgs},</if >
+			<if test = "sreplace != null" >sreplace = #{sreplace},</if >
+		</set >
+		where sssid = #{sssid}
+	</update >
+	
+	<delete id = "deleteSchemeAndStageAndShop" parameterType = "Integer" >
+		delete from s_s_shop
+		where ssid = #{ssid}
+	</delete >
+	
+	
+	<!--阶段下商品 -->
+	<select id = "foundProductBySsid"
+	        resultMap="BaseResultMap" >
+		SELECT ss.`sssid`,ss.`ssid`,ss.`ssort`,ss.`sreplace`
+		FROM `s_s_shop` ss
+		WHERE ss.`ssid`IN
+		<foreach collection = "ssids" item = "ssid" open = "(" close = ")"
+		         separator = "," >
+			#{ssid}
+		</foreach >
+		GROUP BY ss.ssid
+	</select >
+
+	
+
+</mapper >

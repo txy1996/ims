@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxShopDao">
+	<resultMap id="SetResultMap" type="WxShop">
+		<result column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="scid" property="scid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="sad" property="sad" />
+		<result column="stel" property="stel" />
+		<result column="sinfo" property="sinfo" />
+		<result column="slogo" property="slogo" />
+		<result column="styleimg" property="styleimg" />
+		<association property="wximages" javaType="WxImages">
+			<id column="aid" property="aid" />
+			<result column="iid" property="iid" />
+			<result column="iname" property="iname" />
+			<result column="iurl" property="iurl" />
+			<result column="iimgurl" property="iimgurl" />
+			<result column="idate" property="idate" />
+		</association>
+		<association property="pro" javaType="WxProduct">
+			<id column="id" property="id" />
+			<result column="price" property="price" />
+			<result column="yprice" property="yprice" />
+			<result column="sid" property="sid" />
+			<result column="cid" property="cid" />
+			<result column="pname" property="pname" />
+			<result column="ptitle" property="ptitle" />
+		</association>
+		<association property="wxalbum" javaType="WxAlbum">
+			<id column="sid" property="sid" />
+			<result column="aid" property="aid" />
+			<result column="ssid" property="ssid" />
+			<result column="faid" property="faid" />
+			<result column="aname" property="aname" />
+			<result column="ainfo" property="ainfo" />
+			<result column="aimg" property="aimg" />
+			<result column="urid" property="urid" />
+			<result column="auid" property="auid" />
+			<result column="adate" property="adate" />
+		</association>
+		<association property="proimg" javaType="WxProductimg">
+			<id column="id" property="id" />
+			<result column="pid" property="pid" />
+			<result column="url" property="url" />
+			<result column="tfimg" property="tfimg" />
+			<result column="name" property="name" />
+			<result column="updata" property="updata" />
+		</association>
+	</resultMap>
+	<select id="selectshop" parameterType="Integer" resultMap="SetResultMap">
+		select s.* from shop s 
+		where s.sid = #{sid}
+	</select>
+	<select id="selectype1" resultMap="SetResultMap">
+		select s.sname,s.slogo,p.id from (select  * from product
+		where cid=(select cid from product where sid=#{sid}))p INNER JOIN shop s on p.sid = s.sid
+        where 1 = 1 
+		and #{Latitude1}&gt;#{minlat} and #{Latitude1}&lt;#{maxlat} and
+		#{Longitude1}&lt;#{minlng} and #{Longitude1} &gt;#{maxlng}
+		and s.scid = #{scid} and s.sid !=#{sid} limit 0,3
+	</select>
+	<select id="selectype" resultMap="SetResultMap">
+		select s.sid,s.sname,s.slogo from shop s
+		where 1=1
+		and #{Latitude1}&gt;#{minlat} and #{Latitude1}&lt;#{maxlat} and
+		#{Longitude1}&lt;#{minlng} and #{Longitude1} &gt;#{maxlng}
+		and s.scid = #{scid} and s.sid !=#{id} limit 0,3
+	</select>
+	<select id="findshopproduct" resultMap="SetResultMap">
+		SELECT
+		sh.`sname`,sh.`sid`,pro.id,pro.price,pro.yprice,pro.pname,proimg.url
+		FROM shop sh INNER JOIN
+		product pro ON sh.sid=pro.sid INNER JOIN productimg proimg ON
+		pro.id=proimg.pid
+		AND pro.state=1
+		<!-- <if test="ptitle1 !=null"> AND pro.`ptitle` &gt;= ${ptitle1} </if> 
+			<if test="ptitle2 !=null"> AND pro.`ptitle` &lt;= ${ptitle2} </if> -->
+		<if test="sid !=null">
+			AND sh.sid=#{sid} LIMIT 1,4
+		</if>
+		<if test="cid !=null">
+			and pro.`cid`=#{cid}
+			GROUP BY sh.`sid`
+		</if>
+	</select>
+
+	<select id="findproduct" resultMap="SetResultMap" parameterType="String">
+		SELECT b.sname,a.id,a.pname,a.yprice,c.url FROM product a,shop
+		b,productimg c
+		WHERE a.cid=#{id} AND a.`sid`=b.`sid` AND a.`id`=c.`pid`
+		LIMIT 1,4
+	</select>
+	<!-- a.id,a.cid,a.pname,a.price,a.yprice -->
+	<select id="findproductlist" resultMap="SetResultMap">
+		SELECT
+		sh.`sname`,sh.`sid`,pro.*,proimg.url
+		FROM shop sh INNER JOIN
+		product pro ON sh.sid=pro.sid INNER JOIN productimg proimg ON
+		pro.id=proimg.pid
+		AND pro.state=1 AND
+		pro.stock &gt; 0
+		<if test="srange !=null">
+			AND pro.property LIKE '%:${srange}%'
+		</if>
+		<if test="sduration !=null">
+			AND pro.property LIKE '%:${sduration}%'
+		</if>
+		<if test="spnum !=null">
+			AND pro.property LIKE '%:${spnum}%'
+		</if>
+		<if test="cid !=null">
+			and pro.`cid`=#{cid}
+			GROUP BY sh.`sid`
+		</if>
+	</select>
+
+	<select id="findWxShopBySid" resultType="WxShop" parameterType="int">
+		SELECT sh.sname,sh.slogo
+		FROM `shop` sh
+		WHERE sh.sid=#{sid}
+	</select>
+	<!-- 查询优质商家 -->
+	<select id="shopy" resultMap="SetResultMap">
+		select sid,sname,slogo from shop where sid in (${_parameter})
+	</select>
+	<!-- 商品类型的商户 -->
+	<select id="shoppro" parameterType="Integer" resultMap="SetResultMap">
+		select s.*,p.id,p.cid,p.pname,p.price,p.ptitle from shop s,(SELECT * FROM product
+		where id = #{id})p where s.sid =(SELECT sid FROM product where id =
+		#{id})
+	</select>
+</mapper>

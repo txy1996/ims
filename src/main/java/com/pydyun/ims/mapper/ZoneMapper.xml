@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.ZoneDao">
+	<resultMap id="SetResultMap" type="Zone">
+		<result column="zid" property="zid" />
+		<result column="zname" property="zname" />
+		<result column="z_zid" property="z_zid" />
+
+	</resultMap>
+	<select id="selectzid"  resultType="Zone">
+		select z.zid,z.zname from zone z where zid &lt;90
+	</select>
+	<select id="querzone"  resultType="Zone">
+		select z.zid,z.zname from zone z where zid &lt;90
+	</select>
+</mapper>

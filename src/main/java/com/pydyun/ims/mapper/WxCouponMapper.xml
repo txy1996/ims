@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxCouponDao">
+	<resultMap id="SetResultMap" type="WxCoupon">
+		<result column="csdate" property="csdate" />
+		<result column="codate" property="codate" />
+		<result column="cfullcut" property="cfullcut" />
+		<result column="csum" property="csum" />
+		<result column="cprice" property="cprice" />
+		<result column="ctitle" property="ctitle" />
+		<result column="cinfo" property="cinfo" />
+		<result column="cimg" property="cimg" />
+	</resultMap>
+	<select id="selectcc" parameterType="String" resultType="WxCoupon">
+		select c.csdate,c.codate,c.cfullcut,c.csum,c.cprice,c.ctitle,c.cinfo,c.cimg
+		from coupon c where c.crange = #{crange}
+	</select>
+
+
+	<resultMap id="WxCouponResponse" type="WxCouponResponse">
+		<result column="ctitle" property="ctitle" />
+		<result column="cimg" property="cimg" />
+		<result column="crange" property="crange" />
+		<result column="csdate" property="csdate" />
+		<result column="codate" property="codate" />
+		<result column="cdiscount" property="cdiscount" />
+		<result column="csum" property="csum" />
+		<result column="cfullcut" property="cfullcut" />
+		<result column="ucstate" property="ucstate" />
+	</resultMap>
+	<select id="findCouponByUrid" resultMap="WxCouponResponse">
+		SELECT
+		co.`ctitle`,co.`cimg`,co.`crange`,co.`csdate`,co.`codate`,
+		co.`cdiscount`,co.`csum`,co.`cfullcut`,uc.`ucstate`
+		FROM `u_c_log` uc
+		LEFT JOIN `coupon` co ON uc.`cid`=co.`cid`
+		WHERE uc.`urid`=#{urid}
+		AND
+		uc.`ucstate`=1
+		AND uc.`ucInvalid` IS NULL
+	</select>
+
+	<select id="findCouponInvalidByUrid"
+		resultMap="WxCouponResponse">
+		SELECT
+		co.`ctitle`,co.`cimg`,co.`crange`,co.`csdate`,co.`codate`,
+		co.`cdiscount`,co.`csum`,co.`cfullcut`,uc.`ucstate`
+		FROM `u_c_log` uc
+		LEFT JOIN `coupon` co ON uc.`cid`=co.`cid`
+		WHERE uc.`urid`=#{urid}
+		AND
+		uc.`ucstate` <![CDATA[ <> ]]>
+		1
+		AND uc.`ucInvalid` IS NOT NULL
+	</select>
+	
+	<select id="getCouponCountByUrid"
+		resultType="int">
+		SELECT COUNT(uc.`uclid`) AS Coupon
+
+		FROM `u_c_log` uc
+		
+		WHERE uc.`urid`=#{urid}
+		AND
+		uc.`ucstate`=1
+		AND uc.`ucInvalid` IS NULL
+	</select>
+</mapper>

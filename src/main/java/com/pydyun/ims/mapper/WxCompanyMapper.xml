@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxCompanyDao">
+
+	<resultMap id="Company" type="WxCompany">
+		<result column="cid" property="cid" />
+		<result column="zid" property="zid" />
+		<result column="cname" property="cname" />
+		<result column="cgeneral_taxpayer" property="cgeneral_taxpayer" />
+		<result column="cidentify" property="cidentify" />
+		<result column="ccode" property="ccode" />
+		<result column="caddress" property="caddress" />
+		<result column="cbank" property="cbank" />
+		<result column="caccount" property="caccount" />
+		<result column="ctel" property="ctel" />
+		<result column="cinfo" property="cinfo" />
+	</resultMap>
+
+
+	<!--微信:发票管理 -->
+	<insert id="saveWxCompany" parameterType="WxCompany">
+		<selectKey resultType="int" order="AFTER" keyProperty="cid">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into `company`
+		(zid,cname,cgeneral_taxpayer,cidentify,ccode,caddress,cbank,caccount,ctel,cinfo)
+		values(#{zid},#{cname},#{cgeneral_taxpayer},#{cidentify},#{ccode},#{caddress},#{cbank},#{caccount},#{ctel},#{cinfo})
+	</insert>
+
+	<!--微信:查询发票 -->
+	<select id="findWxCompany" parameterType="int"
+		resultType="Company">
+		SELECT
+		co.`cid`,co.`zid`,co.`cname`,co.`cgeneral_taxpayer`,co.`cidentify`,
+		co.`ccode`,co.`caddress`,co.`cbank`,co.`caccount`,co.`ctel`,co.`cinfo`
+		FROM `user_position` up
+		LEFT JOIN `company` co ON up.`cid`=co.`cid`
+		WHERE up.`urid`=#{urid}
+	</select>
+
+	<!--微信:删除发票 -->
+	<delete id="deleteWxCompany" parameterType="int">
+		DELETE FROM
+		`company`
+		WHERE cid =#{cid}
+	</delete>
+	<!-- 微信:修改发票 -->
+	<update id="updateWxCompany" parameterType="WxCompany">
+		UPDATE company
+		<set>
+			<if test="zid != null">zid=#{zid},</if>
+			<if test="cname != null">cname=#{cname},</if>
+			<if test="cgeneral_taxpayer != null">cgeneral_taxpayer=#{cgeneral_taxpayer},</if>
+			<if test="cidentify != null">cidentify=#{cidentify},</if>
+			<if test="ccode != null">ccode=#{ccode},</if>
+			<if test="caddress != null">caddress=#{caddress},</if>
+			<if test="cbank != null">cbank=#{cbank},</if>
+			<if test="caccount != null">caccount=#{caccount},</if>
+			<if test="ctel != null">ctel=#{ctel},</if>
+			<if test="cinfo != null">cinfo=#{cinfo}</if>
+		</set>
+		WHERE cid =#{cid}
+	</update>
+</mapper>

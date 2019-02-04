@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.UserCouponDao">
+
+		<resultMap id="uclog" type="U_c_log">
+		<id column="uclid" property="uclid" />
+		<result column="urid" property="urid" />
+		<result column="sid" property="sid" />
+		<result column="auid" property="auid" />
+		<result column="cid" property="cid" />						
+		<result column="ucgetdate" property="ucgetdate" />
+		<result column="ucgetchannel" property="ucgetchannel" />		
+		<result column="ucgetinfo" property="ucgetinfo" />
+		<result column="ucInvalid" property="ucInvalid" />
+		<result column="ucodate" property="ucodate" />
+		<result column="ucstate" property="ucstate" />
+		<result column="ucinfo" property="ucinfo" />
+		<result column="uccode" property="uccode" />
+		<result column="ucimg" property="ucimg" />
+		<association property="s" javaType="Shop">
+		<id column="scid" property="scid" />
+		<result column="sid" property="sid" />
+		<result column="zid" property="zid" />
+		<result column="bid" property="bid" />
+		<result column="sname" property="sname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="scoordinate" property="scoordinate" />
+		<result column="scommerce" property="scommerce" />
+		<result column="sstate" property="sstate" />	
+		<result column="sad" property="sad" />
+		<result column="sinfo" property="sinfo" />
+		<result column="ssort" property="ssort" />
+		<result column="sbalancetype" property="sbalancetype" />
+		<result column="sbwx" property="sbwx" />
+		<result column="sbzfb" property="sbzfb" />
+		<result column="sbyhk" property="sbyhk" />
+		<result column="slogo" property="slogo" />
+		<result column="styleimg" property="styleimg" />
+		</association>	
+		<association property="sb" javaType="ShopBrand">
+		<id column="bid" property="bid" />
+		<result column="bname" property="bname" />
+		<result column="binfo" property="binfo" />
+		</association>		
+		<association property="cou" javaType="Coupon">
+		<id column="cid" property="cid" />
+		<result column="ccid" property="ccid" />
+		<result column="csdate" property="csdate" />
+		<result column="codate" property="codate" />
+		<result column="crange" property="crange" />
+		<result column="cdiscount" property="cdiscount" />
+		<result column="csum" property="csum" />
+		<result column="cfullct" property="cfullct" />
+		<result column="cisood" property="cisood" />
+		<result column="cintegration" property="cintegration" />
+		<result column="cmoney" property="cmoney" />
+		<result column="cprice" property="cprice" />
+		<result column="cgoods" property="cgoods" />
+		<result column="cimg" property="cimg" />
+		<result column="ctitle" property="ctitle" />
+		<result column="cinfo" property="cinfo" />
+		<result column="crefund" property="crefund" />
+		<result column="cisrepeat" property="cisrepeat" />
+		<result column="uaid" property="uaid" />
+		<result column="crid" property="crid" />
+		</association>
+	</resultMap>
+
+
+	<select id="findall" parameterType="int" resultMap="uclog">
+		SELECT uc.uclid,cou.ctitle,cou.cprice,uc.cid,
+	cou.crange,uc.ucstate,cou.csdate,cou.codate,uc.sid,c.bname,uc.ucgetchannel,
+	uc.ucinfo,uv.uclInvalid
+		FROM u_c_log uc INNER JOIN coupon cou ON uc.cid=cou.cid
+		AND uc.urid=#{urid}
+		left JOIN (SELECT a.sid,b.bname FROM shop a INNER JOIN brand b ON a.bid=b.bid) c 
+		ON uc.sid=c.sid 
+	<if test="csdate !=null">
+		and cou.csdate &gt;= '${csdate}'
+	</if>
+	<if test="codate !=null">
+		and cou.codate &lt;= '${codate}'
+	</if>
+	<if test="ucstate !=null">
+		and uc.ucstate=#{ucstate}
+	</if>
+	<!-- and uc.`ucInvalid` IS NULL -->
+	</select>
+	
+	<select id="select" resultType="U_c_log">
+		select * from u_c_log
+	</select>
+	
+	<update id="update">
+		UPDATE u_c_log SET ucinfo= #{ucinfo},ucstate=0,ucInvalid=#{ucInvalid} WHERE uclid = #{uclid}
+	</update>
+	
+	<update id="update1">
+		UPDATE u_c_log SET ucinfo= #{ucinfo},,ucstate=2 WHERE uclid = #{uclid}
+	</update>
+	
+	<insert id="insertuclog" parameterType="U_c_log" useGeneratedKeys="true"
+		keyProperty="uclid">
+		
+		INSERT INTO u_c_log (uclid,cid,urid,ucgetdate,ucgetchannel,uccode,ucimg,ucstate)
+		VALUES(#{uclid},#{cid},#{urid},#{ucgetdate},#{ucgetchannel},#{uccode},#{ucimg},#{ucstate})
+		
+		</insert>
+	
+	<select id="selectmaxid" resultType="java.lang.Integer">
+		SELECT MAX(uclid) FROM u_c_log	
+	</select>
+	<update id="alterTable">
+		ALTER TABLE u_c_log AUTO_INCREMENT = 1;
+	</update>
+	
+	<select id="findcid" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		SELECT cid FROM u_c_log WHERE urid=#{urid}
+	</select>
+
+</mapper>

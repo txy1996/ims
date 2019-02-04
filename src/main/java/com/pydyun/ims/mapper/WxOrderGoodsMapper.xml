@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxOrderGoodsDao" >
+
+	<resultMap id = "WxOrderGoodsMap" type = "WxOrderGoods" >
+		<result column = "ogid" property = "ogid" />
+		<result column = "oid" property = "oid" />
+		<result column = "vid" property = "vid" />
+		<result column = "vtype" property = "vtype" />
+		<result column = "ognum" property = "ognum" />
+		<result column = "ogmoney" property = "ogmoney" />
+	</resultMap >
+	
+	<!--新增订单下商品 -->
+	<insert id = "saveWxOrderGoods" parameterType = "java.util.List"
+	        useGeneratedKeys = "true" keyProperty = "ogid" >
+		INSERT into
+		order_goods(oid,vid,vtype,ognum,ogmoney,stime,otime,pnum)
+		VALUES
+		<foreach collection = "list" item = "wxOrderGoods" index = "index"
+		         separator = "," >
+			(#{wxOrderGoods.oid},#{wxOrderGoods.vid},#{wxOrderGoods.vtype},
+			#{wxOrderGoods.ognum},#{wxOrderGoods.ogmoney},#{wxOrderGoods.stime},
+			#{wxOrderGoods.otime},#{wxOrderGoods.pnum})
+		</foreach >
+	</insert >
+	
+	<!--微信:删除订单下商品 -->
+	<delete id = "deleteWxOrderGoods" >
+		DELETE FROM
+		order_goods
+		WHERE oid in
+		<foreach collection = "oids" item = "oid" index = "no" open = "("
+		         separator = "," close = ")" >
+			#{oid}
+		</foreach >
+	</delete >
+	<!--修改订单下商品 -->
+	<update id = "updateWxOrderGoods" parameterType = "WxOrderGoods" >
+		UPDATE order_goods
+		<set >
+			<if test = "ognum != null" >ognum=#{ognum},</if >
+			<if test = "ogmoney != null" >ogmoney=#{ogmoney}</if >
+			<if test = "isrm != null" >isrm=#{isrm}</if >
+		</set >
+		WHERE oid =#{oid} and vid=#{vid} and vtype=#{vtype}
+	</update >
+	
+	
+	<select id = "findWxOrderGoodsByIds" parameterType = "java.util.List"
+	        resultType = "int" >
+		select count(og.ogid) as num
+		from `order_goods` og
+		where
+		og.isrm=0
+		AND og.vtype=0
+		AND og.`oid` IN
+		<foreach collection = "oids" item = "oid" open = "(" close = ")" separator = "," >
+            #{oid}
+        </foreach >
+
+	</select >
+
+
+
+
+</mapper >

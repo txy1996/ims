@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.WxOrdersDao" >
+
+    <resultMap id = "WxOrdersResponseMap"
+               type = "WxOrdersResponseList" >
+        <result column = "oid" property = "oid" />
+	    <!--<result column = "cid" property = "sid" />-->
+	    <result column = "sname" property = "sname" />
+        <result column = "odate" property = "odate" />
+        <result column = "onum" property = "onum" />
+        <result column = "omoney" property = "omoney" />
+        <result column = "ostae" property = "ostae" />
+        <result column = "img" property = "img" />
+        <result column = "pid" property = "pid" />
+        <result column = "onoun" property = "onoun" />
+    </resultMap >
+	
+	<!--新增订单 -->
+	<insert id = "saveWxOrders" parameterType = "java.util.List"
+	        useGeneratedKeys = "true" keyProperty = "oid" >
+        INSERT into
+        orders(urid,cid,odate,onum,opaytype,opaymodel,oispay,
+        ogetintegration,omoney,ogoods,oisinvoice,ostae,onoinfo,oshfs,oshname,
+        oshtel,oshaddress,oexpress,oexpresssn,onoun,ofreight,oinfo,omsg)
+        VALUES
+        <foreach collection = "list" item = "wxOrders" index = "index"
+                 separator = "," >
+            (#{wxOrders.urid},#{wxOrders.cid},#{wxOrders.odate},#{wxOrders.onum},
+            #{wxOrders.opaytype},#{wxOrders.opaymodel},
+            #{wxOrders.oispay},#{wxOrders.ogetintegration},
+            #{wxOrders.omoney},#{wxOrders.ogoods},#{wxOrders.oisinvoice},
+            #{wxOrders.ostae},#{wxOrders.onoinfo},#{wxOrders.oshfs},
+            #{wxOrders.oshname},#{wxOrders.oshtel},#{wxOrders.oshaddress},
+            #{wxOrders.oexpress},#{wxOrders.oexpresssn},#{wxOrders.onoun},#{wxOrders.ofreight},
+            #{wxOrders.oinfo},#{wxOrders.omsg})
+        </foreach >
+    </insert >
+	<!--修改订单 -->
+	<update id = "updateWxOrders" >
+        UPDATE orders
+        <set >
+            <if test = "ostae != null" >ostae=#{ostae}</if >
+        </set >
+        WHERE oid in
+        <foreach collection = "list" item = "oid" open = "(" close = ")"
+                 separator = "," >
+            #{oid}
+        </foreach >
+    </update >
+	<!--微信:查询用户订单 -->
+	<select id = "findWxOrdersList" parameterType = "WxOrders"
+	        resultMap = "WxOrdersResponseMap" >
+       	SELECT os.`oid`,os.`cid`,sh.sname,os.`odate`,os.`onum`,os.`omoney`,os.`ostae`,
+        os.`onoun`,ors.pid,ors.img
+        FROM `orders` os
+        LEFT JOIN (SELECT ors.`oid` AS oid,
+		GROUP_CONCAT(CONCAT(IFNULL(pr.`url`,''),IFNULL(vo.`vimg`,''))) AS img,
+		GROUP_CONCAT(CONCAT(os.`vid`)) AS pid
+        FROM `orders` ors
+        LEFT JOIN `order_goods` os ON os.`oid`=ors.`oid`
+        LEFT
+        JOIN `productimg` pr ON pr.`pid`=os.`vid` AND os.`vtype`=0
+        LEFT JOIN
+        `voucher` vo ON vo.`vid`=os.`vid` AND os.`vtype`=1
+        WHERE
+        ors.`urid`=#{urid}
+        GROUP BY ors.`oid`) ors ON ors.oid=os.`oid`
+        LEFT JOIN `shop` sh ON sh.sid=os.`cid`
+        WHERE
+        os.`urid`=#{urid}
+        <if test = "ostae !=null" >
+            AND os.`ostae`=#{ostae}
+        </if >
+        group by os.`ostae`,os.`oid` desc
+    </select >
+
+
+    <resultMap id = "WxOrders" type = "WxOrdersResponse" >
+        <result column = "oid" property = "oid" />
+        <result column = "urid" property = "urid" />
+        <result column = "cid" property = "cid" />
+        <result column = "odate" property = "odate" />
+        <result column = "onum" property = "onum" />
+        <result column = "opaytype" property = "opaytype" />
+        <result column = "opaymodel" property = "opaymodel" />
+        <result column = "oispay" property = "oispay" />
+        <result column = "ogetintegration" property = "ogetintegration" />
+        <result column = "omoney" property = "omoney" />
+        <result column = "ogoods" property = "ogoods" />
+        <result column = "oisinvoice" property = "oisinvoice" />
+        <result column = "ostae" property = "ostae" />
+        <result column = "onoinfo" property = "onoinfo" />
+        <result column = "oshfs" property = "oshfs" />
+        <result column = "oshname" property = "oshname" />
+        <result column = "oshtel" property = "oshtel" />
+        <result column = "oshaddress" property = "oshaddress" />
+        <result column = "oexpress" property = "oexpress" />
+        <result column = "oexpresssn" property = "oexpresssn" />
+        <result column = "onoun" property = "onoun" />
+        <result column = "sname" property = "sname" />
+        <result column = "sid" property = "sid" />
+        <result column = "ofreight" property = "ofreight" />
+    </resultMap >
+	
+	
+	<!--根据订单编号查询订单详情 -->
+	<select id = "getWxOrdersList" parameterType = "string"
+	        resultMap = "WxOrders" >
+		SELECT
+		os.`oid`,os.`oshname`,os.`odate`,os.`onoun`,os.`opaytype`,os.`opaymodel`,
+		os.`oisinvoice`,os.`oexpress`,os.`oexpresssn`
+		,os.`oshtel`,os.`oshaddress`,
+		os.`omoney`,os.`onum`,
+		sh.`sname`,sh.`sid`,os.ofreight
+		FROM `orders` os
+		LEFT JOIN `order_goods`
+		og ON
+		og.`oid`=os.`oid`
+		LEFT JOIN `productimg` pr ON pr.`pid`=og.`vid`
+		AND
+		og.`vtype`=0
+		LEFT JOIN `product` pt ON pt.`id`=og.`vid` AND
+		og.`vtype`=0
+		LEFT JOIN `shop` sh ON sh.`sid`=os.`cid`
+		LEFT JOIN
+		`voucher` vo ON vo.`vid`=og.`vid` AND og.`vtype`=1
+		WHERE
+		os.`onoun`=#{onoun}
+		GROUP BY os.`oid`
+	</select >
+
+    <resultMap id = "WxProductAndVoucherResponceMap"
+               type = "WxProductAndVoucherResponce" >
+        <result column = "id" property = "id" />
+        <result column = "name" property = "name" />
+        <result column = "price" property = "price" />
+        <result column = "yprice" property = "yprice" />
+        <result column = "status" property = "status" />
+        <result column = "vtype" property = "type" />
+        <result column = "isrm" property = "isrm" />
+        <result column = "imgurl" property = "imgurl" />
+        <result column = "attributes" property = "attributes" />
+        <result column = "num" property = "num" />
+        <result column = "amount" property = "amount" />
+    </resultMap >
+	<!--查询订单下商品 -->
+	<select id = "getWxOrdersProduct" parameterType = "int"
+	        resultMap = "WxProductAndVoucherResponceMap" >
+		select os.ognum as num,os.ogmoney as
+		amount,os.isrm,pt.id,pt.pname as
+		name,
+		pt.yprice ,
+		pt.price ,
+		pt.state as
+		status,img.url as
+		imgurl,pt.property as attributes,
+		os.`vtype`
+		from order_goods
+		os
+		left join product pt
+		on os.vid=pt.id
+		left join productimg img
+		on pt.id=img.pid
+		where
+		os.oid=#{oid}
+		and os.vtype=0
+	</select >
+	
+	<!--查询订单下代金券 -->
+	<select id = "getWxOrdersVoucher" parameterType = "int"
+	        resultMap = "WxProductAndVoucherResponceMap" >
+		SELECT os.ognum as num ,os.ogmoney as amount,os.isrm,vo.vid as
+		id,
+		vo.vtitle as name,vo.vimg as imgurl,vo.vrange as attributes,
+		vo.vprice as price,os.vtype,
+		(
+		CASE
+		WHEN vo.vstore &gt;0 AND NOW()
+		&lt; vo.vodate
+		THEN '1'
+		ELSE '0'
+		END ) STATUS FROM order_goods
+		os LEFT JOIN voucher
+		vo
+		ON
+		vo.vid=os.vid
+		WHERE os.oid=#{oid}
+		AND os.vtype =1
+	</select >
+	
+	<!--微信:删除用户订单 -->
+	<delete id = "deleteWxOrders" parameterType = "java.lang.String" >
+		DELETE FROM
+		`orders`
+		WHERE onoun =#{onoun}
+		AND ostae <![CDATA[!= ]]> 0
+	</delete >
+
+
+    <select id = "findWxOrdersOid" parameterType = "java.lang.String"
+            resultType = "int" >
+		select os.`oid`
+		from `orders` os
+		where os.`onoun`=#{onoun}
+	</select >
+
+
+</mapper >

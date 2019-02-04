@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.pydyun.ims.dao.SchemeRecordingDao" >
+	<resultMap id = "SchemeRecordingMap" type = "SchemeRecording" >
+		<id column = "srid" property = "srid" />
+		<result column = "urid" property = "urid" />
+		<result column = "sid" property = "sid" />
+		<result column = "date" property = "date" />
+		<result column = "phone" property = "phone" />
+	</resultMap >
+	<!--新增方案记录-->
+	<insert id = "saveSchemeRecording"
+	        parameterType = "SchemeRecording" >
+		INSERT INTO
+			scheme_recording (urid, sid, date, phone)
+		VALUES (#{urid}, #{sid}, CURRENT_TIMESTAMP, #{phone})
+	</insert >
+	
+	<resultMap id = "SchemeRecordingResponseMap" type = "SchemeRecordingResponse" >
+		<id column = "srid" property = "srid" />
+		<result column = "urid" property = "urid" />
+		<result column = "sid" property = "sid" />
+		<result column = "date" property = "date" />
+		<result column = "username" property = "username" />
+		<result column = "sname" property = "sname" />
+		<result column = "phone" property = "phone" />
+		<result column = "status" property = "status" />
+	</resultMap >
+	<!--查询方案记录表-->
+	<select id = "findSchemeRecording" resultMap = "SchemeRecordingResponseMap" >
+		SELECT
+			sr.`srid`,
+			sr.`urid`,
+			sr.`sid`,
+			sr.`phone`,
+			sc.`sname`,
+			su.`username`,
+			sr.`date`,
+			sr.`status`
+		FROM `scheme_recording` sr
+			LEFT JOIN `scheme` sc ON sr.`sid` = sc.`sid`
+			LEFT JOIN `sys_user` su ON su.`id` = sr.`urid`
+			<where >
+				<if test = "status!=null">
+				AND sr.`status`<![CDATA[ != ]]> #{status}
+				</if>
+			</where >
+		ORDER BY sr.`status`,sr.`srid`
+	</select >
+	<update id = "updateSchemeRecording" parameterType = "SchemeRecordingRequest" >
+		UPDATE scheme_recording
+		<set >
+			<if test = "status != null" >status=#{status},</if >
+		</set >
+		WHERE srid = #{srid}
+	</update >
+	
+ 
+
+
+
+
+
+</mapper >

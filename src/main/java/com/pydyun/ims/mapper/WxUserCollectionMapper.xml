@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pydyun.ims.dao.WxUserCollectionDao">
+
+
+	<!-- 个人中心-我的收藏-商户返回封装 -->
+	<resultMap id="WxUserCollectionShopResponse"
+		type="WxUserCollectionShopResponse">
+		<result column="ucid" property="ucid" />
+		<result column="urid" property="urid" />
+		<result column="oid" property="oid" />
+		<result column="otype" property="otype" />
+		<result column="uctype" property="uctype" />
+		<result column="ucdate" property="ucdate" />
+		<result column="sname" property="sname" />
+		<result column="slogo" property="slogo" />
+		<result column="bname" property="bname" />
+		<result column="saddress" property="saddress" />
+		<result column="stel" property="stel" />
+		<result column="sstate" property="sstate" />
+		<result column="voucher" property="voucher" />
+		<result column="offer" property="offer" />
+	</resultMap>
+	<!-- 个人中心-我的收藏-商户 -->
+	<select id="findUserCollectionByShop"
+		resultMap="WxUserCollectionShopResponse">
+		SELECT
+		uc.`ucid`,uc.`oid`,uc.`otype`,uc.`uctype`,uc.`ucdate`,
+		sh.`sname`,sh.`slogo`,br.`bname`,sh.`saddress`,sh.`stel`,sh.`sstate`,
+		(
+		CASE
+		WHEN vo.brand IS NOT NULL THEN
+		'代金券'
+		ELSE
+		''
+		END
+		) voucher,
+		(
+		CASE
+		WHEN
+		co.offer IS NOT NULL THEN
+		'优惠券'
+		ELSE
+		''
+		END
+		) offer
+		FROM `user_collection`
+		uc
+		LEFT JOIN `shop` sh ON sh.sid=uc.`oid`
+		LEFT
+		JOIN `brand` br ON
+		br.`bid`=sh.`bid`
+		LEFT JOIN (SELECT
+		GROUP_CONCAT(CONCAT(SUBSTRING_INDEX(vo.`vrange`,':',-1))) AS brand
+		FROM `voucher` vo
+		WHERE vo.`vsdate` &lt; CURRENT_DATE AND vo.`vodate`
+		&gt;
+		CURRENT_DATE
+		AND vo.`vstore` <![CDATA[!= ]]>0
+		AND vo.`vrange`<![CDATA[!= ]]>'all'
+		) vo ON
+		FIND_IN_SET(br.`bid`,vo.brand)OR FIND_IN_SET(sh.`sid`,vo.brand)
+		LEFT
+		JOIN (SELECT
+		GROUP_CONCAT(CONCAT(SUBSTRING_INDEX(co.`crange`,':',-1)))
+		AS offer
+		FROM
+		`coupon` co
+		WHERE co.`csdate` &lt; CURRENT_DATE AND
+		co.`codate` &gt;
+		CURRENT_DATE
+		AND co.`cstore` <![CDATA[!= ]]>0
+		AND co.`crange`<![CDATA[!= ]]>'all'
+		)
+		co ON FIND_IN_SET(br.`bid`,co.offer)OR FIND_IN_SET(sh.`sid`,co.offer)
+		WHERE uc.`urid`=#{urid}
+		AND
+		uc.`otype`=0
+		AND uc.`uctype`=1
+	</select>
+
+	<!-- 个人中心-我的收藏-商品返回封装 -->
+	<resultMap id="WxUserCollectionProductResponseMap"
+		type="WxUserCollectionProductResponse">
+		<result column="ucid" property="ucid" />
+		<result column="urid" property="urid" />
+		<result column="oid" property="oid" />
+		<result column="cid" property="cid" />
+		<result column="otype" property="otype" />
+		<result column="uctype" property="uctype" />
+		<result column="ucdate" property="ucdate" />
+		<result column="pname" property="pname" />
+		<result column="price" property="price" />
+		<result column="yprice" property="yprice" />
+		<result column="state" property="state" />
+		<result column="url" property="url" />
+		<result column="ptitle" property="ptitle" />
+		<result column="psad" property="psad" />
+	</resultMap>
+	<!-- 个人中心-我的收藏-商品 -->
+	<select id="findUserCollectionByProduct"
+		resultMap="WxUserCollectionProductResponseMap">
+		select
+		uc.`ucid`,uc.`oid`,uc.`otype`,uc.`uctype`,uc.`ucdate`,
+		pt.`cid`,pt.`pname`,pt.`price`,pt.`yprice`,pt.`state`,pimg.`url`,
+		pt.`ptitle`,pt.`psad`
+		from
+		`user_collection` uc
+		left join `product` pt on uc.`oid`=pt.`id`
+		left
+		join `productimg` pimg on pt.`id`=pimg.`pid`
+		where uc.`urid`=#{urid}
+		AND uc.`otype`=1
+		AND uc.`uctype`=1
+	</select>
+	
+	<!-- 仅用于查询用户商品的收藏 -->
+	<select id="findshou" resultType="WxUserCollection">
+		SELECT * FROM user_collection WHERE urid=#{urid} AND oid=#{oid} 
+		AND otype=1 AND uctype=1
+	</select>
+	<!-- 仅用于查询用户对商户的收藏 -->
+	<select id="scshop" resultType="WxUserCollection">
+		SELECT * FROM user_collection WHERE urid=#{uid} AND oid=#{sid} 
+		AND otype=0 AND uctype=1
+	</select>
+	<!-- 仅用于用户对商品进行收藏（新增收藏） -->
+	<insert id="insert" parameterType="WxUserCollection">
+		INSERT INTO user_collection (ucid,urid,oid,otype,uctype,ucdate)  
+              VALUES   (#{ucid},  
+                          #{urid},  
+                          #{oid},  
+                          #{otype},  
+                          #{uctype},
+                          #{ucdate}) 
+	</insert>
+	<!-- 仅用于用户对商户进行收藏（新增收藏） -->
+	<insert id="Scshop" parameterType="WxUserCollection">
+		INSERT INTO user_collection (ucid,urid,oid,otype,uctype,ucdate)  
+              VALUES   (#{ucid},  
+                          #{urid},  
+                          #{oid},  
+                          #{otype},  
+                          #{uctype},
+                          #{ucdate}) 
+	</insert>
+	<!-- 仅用于用户对商户取消收藏 -->
+	<delete id="Qxshop" parameterType="Integer">
+		delete from user_collection where ucid = #{ucid}
+	</delete>
+	<!-- 仅用于用户取消收藏 -->
+	<delete id="delete" parameterType="Integer">
+		delete from user_collection where ucid = #{ucid}
+	</delete>
+</mapper>

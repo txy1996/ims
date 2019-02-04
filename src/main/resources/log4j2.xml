@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别从低到高分为TRACE < DEBUG < INFO < WARN < ERROR < FATAL，如果设置为WARN，则低于WARN的信息都不会输出。对于Loggers中level的定义同样适用。-->
+<!--设置log4j2的自身log级别为WARN-->
+<!--只要本文件名为log4j2.xml，则无需在web.xml中配置-->
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <Property name="LOG_HOME">${sys:catalina.home}/WebAppLogs/imsLog</Property>
+    </Properties>
+    <Appenders>
+        <!-- 控制台输出 -->
+        <console name="Console" target="SYSTEM_OUT">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %n%msg%n"/>
+        </console>
+
+        <!-- fileName：输出路径  filePattern：命名规则 -->
+        <!--info输出至文件-->
+        <RollingFile name="RollingFileInfo" fileName="C:\\imsLog\\infoOut.log"
+                     filePattern="C:\\imsLog\\$${date:yyyy-MM-dd}/infoOut-%d{yyyy-MM-dd}-%i.log.gz">
+            <Filters>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <!-- 输出格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+            <!--策略-->
+            <Policies>
+                <!--单个文件的大小限制 -->
+                <SizeBasedTriggeringPolicy size="2MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy同一个文件下的最大文件数 -->
+            <DefaultRolloverStrategy max="50"/>
+        </RollingFile>
+
+        <!--warn输出至文件-->
+        <RollingFile name="RollingFileWarn" fileName="C:\\imsLog\\logs\\hpaasvc\\warn.log"
+                     filePattern="C:\\imsLog\\logs\\hpaasvc\\$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
+            <Filters>
+                <ThresholdFilter level="WARN"/>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+        </RollingFile>
+
+        <!--error输出至文件-->
+        <RollingFile name="RollingFileError" fileName="C:\\imsLog\\logs\\hpaasvc\\error.log"
+                     filePattern="C:\\imsLog\\logs\\hpaasvc\\$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log">
+            <ThresholdFilter level="ERROR"/>
+            <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+        </RollingFile>
+
+    </Appenders>
+
+    <loggers>
+        <!--过滤掉spring和hibernate的一些无用的debug信息-->
+        <logger name="org.springframework" level="info"/>
+        <logger name="org.hibernate" level="info"/>
+        <logger name="org.jboss.netty" level="info"/>
+        <logger name="org.apache.http" level="info"/>
+        <!--info以上的都可以写入文件-->
+        <root level="info">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="RollingFileInfo"/>
+            <appender-ref ref="RollingFileWarn"/>
+            <appender-ref ref="RollingFileError"/>
+        </root>
+    </loggers>
+</Configuration>
